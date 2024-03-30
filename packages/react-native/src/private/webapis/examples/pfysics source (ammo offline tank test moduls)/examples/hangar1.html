@@ -1,0 +1,140 @@
+<canvas id="ctx"></canvas>
+
+
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+				cursor: url(cursor.cur)/*tpa=/textures/cursor.cur.html*/
+				, default;
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+
+		<div id="container"></div>
+<!--<script src="../build/three.min.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+<script src="js/libs/GLTFLoader.js"></script>
+<script src="js/libs/ammo.js"></script>
+<script src="js/base64.js"></script>-->
+<script src="https://proginvert.github.io/moba/three.min.js"></script>
+<script src="https://proginvert.github.io/moba/OrbitControls.js"></script>
+<script src="https://proginvert.github.io/moba/GLTFLoader.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+var renderer = new THREE.WebGLRenderer({canvas:ctx,antialias: true})
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(-3,2,-5)
+var hangar = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+hangar.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,0.2)
+hangar.add(ambientl)
+/*
+Ammo().then( function ( AmmoLib ) {
+Ammo = AmmoLib;
+//init();
+//animate();
+} );*/
+var glftload = new THREE.GLTFLoader()
+isle=null
+var islel = new THREE.Clock()
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/isle_hangar/tropical_island/scene.gltf',(gltfScene)=>{//file.isle
+isle=gltfScene.scene
+isle.mixer = new THREE.AnimationMixer(isle)
+isle.mixer.clipAction(gltfScene.animations[0]).play()
+hangar.add(gltfScene.scene)
+})
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/isle_hangar/t110e5.glb',(gltfScene)=>{//file.mamont
+hangar.add(gltfScene.scene)
+})
+const listener = new THREE.AudioListener()
+camera.add( listener )
+var audioLoader = new THREE.AudioLoader()
+var sea = new THREE.Audio( listener )
+audioLoader.load( 'https://proginvert.github.io/3d_resources/battle_sity_map/isle_hangar/sea.mp3', function( buffer ) {//sound.sea
+	sea.setBuffer( buffer );
+	sea.setLoop( true );
+	sea.setVolume( 0.15 );
+	//sea.setRefDistance( 1 );//
+	//sound.play();
+	//loading_resources.push(true)
+});
+var controls = new THREE.OrbitControls(camera, ctx)
+controls.maxDistance=10
+controls.minDistance=3
+controls.enablePan=false
+controls.enableDamping=true
+//controls.dampingFactor=1
+controls.autoRotate=true
+controls.autoRotateSpeed=0.2
+//controls.minAzimuthAngle=0.35
+//controls.maxAzimuthAngle=1.15
+controls.minPolarAngle=0.1
+controls.maxPolarAngle=1.7-0.02
+controls.target.y=0.5
+controls.update();
+document.onmousedown=function(event){
+sea.play()
+}
+function handleStart(e) {
+		if(e.touches) {
+sea.play()
+
+
+
+		}else{
+		
+		}
+		}
+function startup() {
+  var el = ctx//[0]
+  el.addEventListener("touchstart", handleStart, false);
+  //el.addEventListener("touchend", handleEnd, false);
+ // el.addEventListener("touchcancel", handleCancel, false);
+  //el.addEventListener("touchmove", handleMove, false);
+}
+document.addEventListener("DOMContentLoaded", startup);
+window.addEventListener( 'resize', onWindowResize, false );
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+setInterval(function(){
+controls.update();
+isle.mixer.update(islel.getDelta())
+renderer.render(hangar,camera)
+},1000/50)
+
+</script>

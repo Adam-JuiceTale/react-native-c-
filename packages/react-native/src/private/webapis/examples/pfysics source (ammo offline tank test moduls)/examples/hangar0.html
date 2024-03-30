@@ -1,0 +1,90 @@
+<canvas id="ctx"></canvas>
+
+
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+
+		<div id="container"></div>
+<script src="../build/three.min.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+<script src="js/libs/GLTFLoader.js"></script>
+<script src="js/libs/ammo.js"></script>
+<script src="js/base64.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+var renderer = new THREE.WebGLRenderer({canvas:ctx})
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(0,0,1)
+var hangar = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+hangar.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,0.2)
+hangar.add(ambientl)
+Ammo().then( function ( AmmoLib ) {
+Ammo = AmmoLib;
+//init();
+//animate();
+} );
+var glftload = new THREE.GLTFLoader()
+isle=null
+var islel = new THREE.Clock()
+glftload.load(file.isle,(gltfScene)=>{
+isle=gltfScene.scene
+isle.mixer = new THREE.AnimationMixer(isle)
+isle.mixer.clipAction(gltfScene.animations[0]).play()
+hangar.add(gltfScene.scene)
+})
+glftload.load(file.mamont,(gltfScene)=>{
+hangar.add(gltfScene.scene)
+})
+var controls = new THREE.OrbitControls(camera, ctx);
+controls.update();
+
+window.addEventListener( 'resize', onWindowResize, false );
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+setInterval(function(){
+isle.mixer.update(islel.getDelta())
+renderer.render(hangar,camera)
+},1000/50)
+
+</script>

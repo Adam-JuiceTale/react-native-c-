@@ -1,0 +1,156 @@
+<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+<canvas id="ctx"></canvas>
+		<div id="container"></div>
+<script src="../build/three.min.js"></script>
+
+<script src="js/libs/GLTFLoader.js"></script>
+<script src="js/libs/ammo.js"></script>
+<script src="js/base64.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+var renderer = new THREE.WebGLRenderer({canvas:ctx})
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(0,0,100)
+var range = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+range.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,0.2)
+range.add(ambientl)
+var color_green = new THREE.MeshLambertMaterial({color:0x7fe000})
+var color_blue = new THREE.MeshLambertMaterial({color:0x0588e6})
+var color_purple = new THREE.MeshLambertMaterial({color:0x9305e6})
+
+var geometryball=new THREE.SphereGeometry(1,32,16)
+var geometryblock=new THREE.BoxGeometry(1,1,1)
+var ploskost=new THREE.PlaneGeometry(1,1,1,1)
+
+var nusha = new THREE.Mesh(geometryball,color_purple)
+
+var	collisionConfiguration=null
+var	dispatcher=null
+var	broadphase=null
+var	solver=null
+var	physicsWorld=null
+var fyztime = new THREE.Clock()
+var syncList = [];
+var DISABLE_DEACTIVATION = 4;
+var TRANSFORM_AUX = null
+var ZERO_QUATERNION = null
+var createBox=function(pos, quat, w, l, h, mass, friction) {
+				var material = mass > 0 ? color_blue : color_green;
+				var shape = new THREE.BoxGeometry(w, l, h, 1, 1, 1);
+				var geometry = new Ammo.btBoxShape(new Ammo.btVector3(w * 0.5, l * 0.5, h * 0.5));
+
+				if(!mass) mass = 0;
+				if(!friction) friction = 1;
+
+				var mesh = new THREE.Mesh(shape, material);
+				mesh.position.copy(pos);
+				mesh.quaternion.copy(quat);
+				range.add( mesh );
+
+				var transform = new Ammo.btTransform();
+				transform.setIdentity();
+				transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+				transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+				var motionState = new Ammo.btDefaultMotionState(transform);
+
+				var localInertia = new Ammo.btVector3(0, 0, 0);
+				geometry.calculateLocalInertia(mass, localInertia);
+
+				var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, geometry, localInertia);
+				var body = new Ammo.btRigidBody(rbInfo);
+
+				body.setFriction(friction);
+				//body.setRestitution(.9);
+				//body.setDamping(0.2, 0.2);
+
+				physicsWorld.addRigidBody( body );
+
+				if (mass > 0) {
+					body.setActivationState(DISABLE_DEACTIVATION);
+					// Sync physics and graphics
+					function sync(dt) {
+						var ms = body.getMotionState();
+						if (ms) {
+						console.log(TRANSFORM_AUX.getOrigin())
+							ms.getWorldTransform(TRANSFORM_AUX);
+							var p = TRANSFORM_AUX.getOrigin();
+							var q = TRANSFORM_AUX.getRotation();
+							mesh.position.set(p.x(), p.y(), p.z());
+							mesh.quaternion.set(q.x(), q.y(), q.z(), q.w());
+						}
+					}
+
+					syncList.push(sync);
+				}
+			}
+Ammo().then( function ( AmmoLib ) {
+Ammo = AmmoLib;
+collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
+broadphase = new Ammo.btDbvtBroadphase();
+solver = new Ammo.btSequentialImpulseConstraintSolver();
+physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+physicsWorld.setGravity( new Ammo.btVector3( 0, -9.82, 0 ) );
+TRANSFORM_AUX = new Ammo.btTransform();
+ZERO_QUATERNION = new THREE.Quaternion(0, 0, 0, 1);
+createBox(new THREE.Vector3(0, -1.5, 0), new THREE.Quaternion(0, 1, 1, 1), 5, 5, 5, 35);
+createBox(new THREE.Vector3(0, -25, 0), ZERO_QUATERNION, 50, 5, 50, 0,5);
+			
+} );
+var glftload = new THREE.GLTFLoader()
+
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+setInterval(function(){
+				var dt = fyztime.getDelta();
+				for (var i = 0; i < syncList.length; i++)
+					syncList[i](dt);
+				physicsWorld.stepSimulation( dt, 10 );
+renderer.render(range,camera)
+},1000/50)
+
+</script>

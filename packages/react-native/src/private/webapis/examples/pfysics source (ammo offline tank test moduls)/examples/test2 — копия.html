@@ -1,0 +1,429 @@
+<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+<canvas id="ctx"></canvas>
+		<div id="container"></div>
+<script src="../build/three.min.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+<script src="js/libs/GLTFLoader.js"></script>
+<script src="js/libs/ammo.js"></script>
+<script src="js/base64.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+var renderer = new THREE.WebGLRenderer({canvas:ctx})
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(0,-20,10)
+var range = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+range.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,0.2)
+range.add(ambientl)
+var color_green = new THREE.MeshLambertMaterial({color:0x7fe000})
+var color_blue = new THREE.MeshLambertMaterial({color:0x0588e6})
+var color_purple = new THREE.MeshLambertMaterial({color:0x9305e6})
+
+var geometryball=new THREE.SphereGeometry(1,32,16)
+var geometryblock=new THREE.BoxGeometry(1,1,1)
+var ploskost=new THREE.PlaneGeometry(1,1,1,1)
+
+var nusha = new THREE.Mesh(geometryball,color_purple)
+var loading_resources=[]
+var loading_resources_max=1
+var controls = new THREE.OrbitControls(camera, ctx)
+controls.maxDistance=10
+controls.minDistance=10
+var	collisionConfiguration=null
+var	dispatcher=null
+var	broadphase=null
+var	solver=null
+var	physicsWorld=null
+var fyztime = new THREE.Clock()
+var syncList = [];
+var DISABLE_DEACTIVATION = 4;
+var TRANSFORM_AUX = null
+var ZERO_QUATERNION = null
+var createBox=function(pos, quat, w, l, h, mass, friction) {
+				var material = mass > 0 ? color_blue : color_green;
+				var shape = new THREE.BoxGeometry(w, l, h, 1, 1, 1);
+				var geometry = new Ammo.btBoxShape(new Ammo.btVector3(w * 0.5, l * 0.5, h * 0.5));
+
+				if(!mass) mass = 0;
+				if(!friction) friction = 1;
+
+				var mesh = new THREE.Mesh(shape, material);
+				mesh.position.copy(pos);
+				mesh.quaternion.copy(quat);
+				range.add( mesh );
+
+				var transform = new Ammo.btTransform();
+				transform.setIdentity();
+				transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+				transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+				var motionState = new Ammo.btDefaultMotionState(transform);
+
+				var localInertia = new Ammo.btVector3(0, 0, 0);
+				geometry.calculateLocalInertia(mass, localInertia);
+
+				var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, geometry, localInertia);
+				var body = new Ammo.btRigidBody(rbInfo);
+
+				body.setFriction(friction);
+				//body.setRestitution(.9);
+				//body.setDamping(0.2, 0.2);
+
+				physicsWorld.addRigidBody( body );
+
+				if (mass > 0) {
+					body.setActivationState(DISABLE_DEACTIVATION);
+					// Sync physics and graphics
+					function sync(dt) {
+						var ms = body.getMotionState();
+						if (ms) {
+							ms.getWorldTransform(TRANSFORM_AUX);
+							var p = TRANSFORM_AUX.getOrigin();
+							var q = TRANSFORM_AUX.getRotation();
+							mesh.position.set(p.x(), p.y(), p.z());
+							mesh.quaternion.set(q.x(), q.y(), q.z(), q.w());
+						}
+					}
+
+					syncList.push(sync);
+				}
+			}
+var gone={}
+gone.left=false
+gone.right=false
+gone.up=false
+gone.down=false
+document.onkeydown=function(event){
+if(event.code==='KeyW')
+gone.up=true
+if(event.code==='KeyA')
+gone.left=true
+if(event.code==='KeyS')
+gone.down=true
+if(event.code==='KeyD')
+gone.right=true
+
+}
+document.onkeyup=function(event){
+if(event.code==='KeyW')
+gone.up=false
+if(event.code==='KeyA')
+gone.left=false
+if(event.code==='KeyS')
+gone.down=false
+if(event.code==='KeyD')
+gone.right=false
+}
+			function createVehicle(pos, quat) {
+
+				// Vehicle contants
+
+				var chassisWidth = 2.4;
+				var chassisHeight = 1.5;
+				var chassisLength = 8;
+				var massVehicle = 800;
+
+				var wheelAxisPositionBack = -2.8;//расстояние от центра до жепы
+				var wheelAxisPositionBack2 = -3;
+				var wheelHalfTrackBack = 1.6;//расстояние от кардана до боков
+				var wheelAxisHeightBack = 0;//длинна крепления арматизаторов
+				var wheelRadiusBack = 0.50;//радиус колеса
+				var wheelWidthBack = .1;//ширина колеса
+
+				var wheelAxisFrontPosition = 2;
+				var wheelAxisFrontPosition2 = 1.7;
+				var wheelHalfTrackFront = 1.6;
+				var wheelAxisHeightFront = 0;
+				var wheelRadiusFront = 0.50;
+				var wheelWidthFront = .1;
+
+				var friction = 1000;
+				var suspensionStiffness = 20.0;//жесткость подвески
+				var suspensionDamping = 2.3;//усмирение раскачки
+				var suspensionCompression = 4.4;//Сжатие подвески
+				var suspensionRestLength = 0.7;//длинна арматизаторов
+				var rollInfluence = 0.2;
+
+				var steeringIncrement = .01;//Скорость поворота рулевого колеса
+				var steeringClamp = .7;//сектор поворота руля
+				var maxEngineForce = 2000;//мощьность двигателя
+				var maxBreakingForce = 10;//сила торможения
+
+				// Chassis
+				var geometry = new Ammo.btBoxShape(new Ammo.btVector3(chassisWidth * .5, chassisHeight * .5, chassisLength * .5));
+				var transform = new Ammo.btTransform();
+				transform.setIdentity();
+				transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+				transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+				var motionState = new Ammo.btDefaultMotionState(transform);
+				var localInertia = new Ammo.btVector3(0, 0, 0);
+				geometry.calculateLocalInertia(massVehicle, localInertia);
+				var body = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(massVehicle, motionState, geometry, localInertia));
+				body.setActivationState(DISABLE_DEACTIVATION);
+				physicsWorld.addRigidBody(body);
+				var chassisMesh = createChassisMesh(chassisWidth, chassisHeight, chassisLength);
+
+				// Raycast Vehicle
+				var engineForce = 0;
+				var vehicleSteering = 0;
+				var breakingForce = 0;
+				var tuning = new Ammo.btVehicleTuning();
+				var rayCaster = new Ammo.btDefaultVehicleRaycaster(physicsWorld);
+				var vehicle = new Ammo.btRaycastVehicle(tuning, body, rayCaster);
+				vehicle.setCoordinateSystem(0, 1, 2);
+				physicsWorld.addAction(vehicle);
+
+				// Wheels
+				var FRONT_LEFT = 0;
+				var FRONT_RIGHT = 1;
+				var BACK_LEFT = 2;
+				var BACK_RIGHT = 3;
+				var wheelMeshes = [];
+				var wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0);
+				var wheelAxleCS = new Ammo.btVector3(-1, 0, 0);
+
+				function addWheel(isFront, pos, radius, width, index, side) {
+
+					var wheelInfo = vehicle.addWheel(
+							pos,
+							wheelDirectionCS0,
+							wheelAxleCS,
+							suspensionRestLength,
+							radius,
+							tuning,
+							isFront);
+
+					wheelInfo.set_m_suspensionStiffness(suspensionStiffness);
+					wheelInfo.set_m_wheelsDampingRelaxation(suspensionDamping);
+					wheelInfo.set_m_wheelsDampingCompression(suspensionCompression);
+					wheelInfo.set_m_frictionSlip(friction);
+					wheelInfo.set_m_rollInfluence(rollInfluence);
+
+					wheelMeshes[index] = createWheelMesh(radius, width, side);
+				}
+
+				addWheel(true, new Ammo.btVector3(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition), wheelRadiusFront, wheelWidthFront, FRONT_LEFT,'left');
+				addWheel(true, new Ammo.btVector3(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition), wheelRadiusFront, wheelWidthFront, FRONT_RIGHT,'right');
+				addWheel(false, new Ammo.btVector3(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisPositionBack), wheelRadiusBack, wheelWidthBack, BACK_LEFT,'left');
+				addWheel(false, new Ammo.btVector3(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisPositionBack), wheelRadiusBack, wheelWidthBack, BACK_RIGHT,'right');
+				
+				addWheel(true, new Ammo.btVector3(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition2/2), wheelRadiusFront, wheelWidthFront, 4,'left');
+				addWheel(true, new Ammo.btVector3(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition2/2), wheelRadiusFront, wheelWidthFront, 5,'right');
+				addWheel(false, new Ammo.btVector3(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisPositionBack2/2), wheelRadiusBack, wheelWidthBack, 6,'left');
+				addWheel(false, new Ammo.btVector3(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisPositionBack2/2), wheelRadiusBack, wheelWidthBack, 7,'right');
+
+				// Sync keybord actions and physics and graphics
+				function sync(dt) {
+
+					var speed = vehicle.getCurrentSpeedKmHour();
+
+					//speedometer.innerHTML = (speed < 0 ? '(R) ' : '') + Math.abs(speed).toFixed(1) + ' km/h';
+
+					breakingForce = 0;
+					engineForce = 0;
+
+					if (gone.up) {
+						if (speed < -1)
+							breakingForce = maxBreakingForce;
+						else engineForce = maxEngineForce;
+					}
+					if (gone.down) {
+						if (speed > 1)
+							breakingForce = maxBreakingForce;
+						else engineForce = -maxEngineForce / 2;
+					}
+					if (gone.left) {
+						if (vehicleSteering < steeringClamp)
+							vehicleSteering += steeringIncrement;
+					}
+					else {
+						if (gone.right) {
+							if (vehicleSteering > -steeringClamp)
+								vehicleSteering -= steeringIncrement;
+						}
+						else {
+							if (vehicleSteering < -steeringIncrement)
+								vehicleSteering += steeringIncrement;
+							else {
+								if (vehicleSteering > steeringIncrement)
+									vehicleSteering -= steeringIncrement;
+								else {
+									vehicleSteering = 0;
+								}
+							}
+						}
+					}
+
+					vehicle.applyEngineForce(engineForce, BACK_LEFT);
+					vehicle.applyEngineForce(engineForce, BACK_RIGHT);
+
+					vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
+					vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
+					vehicle.setBrake(breakingForce, BACK_LEFT);
+					vehicle.setBrake(breakingForce, BACK_RIGHT);
+
+					vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
+					vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
+					vehicle.setSteeringValue(vehicleSteering/1.5, 4);
+					vehicle.setSteeringValue(vehicleSteering/1.5, 5);
+
+					var tm, p, q, i;
+					var n = vehicle.getNumWheels();
+					for (i = 0; i < n; i++) {
+						vehicle.updateWheelTransform(i, true);
+						tm = vehicle.getWheelTransformWS(i);
+						p = tm.getOrigin();
+						q = tm.getRotation();
+						wheelMeshes[i].position.set(p.x(), p.y(), p.z());
+						wheelMeshes[i].quaternion.set(q.x(), q.y(), q.z(), q.w());
+					}
+
+					tm = vehicle.getChassisWorldTransform();
+					p = tm.getOrigin();
+					q = tm.getRotation();
+					chassisMesh.position.set(p.x(), p.y(), p.z());
+					chassisMesh.quaternion.set(q.x(), q.y(), q.z(), q.w());
+				}
+
+				syncList.push(sync);
+			}
+						function createChassisMesh(w, l, h) {
+				var shape = new THREE.BoxGeometry(w, l, h, 1, 1, 1);
+				var mesh = striker_chassick
+				//mesh.add(striker_chassick)
+				mesh.rotation.y=2
+				range.add(mesh);
+				return mesh;
+			}
+						function createWheelMesh(radius, width, side) {
+				var t = new THREE.CylinderGeometry(radius, radius, width, 24, 1);
+				t.rotateZ(Math.PI / 2);
+				var mesh2 =striker_wheel.clone()
+				//mesh.add(new THREE.Mesh(new THREE.BoxGeometry(width * 1.5, radius * 1.75, radius*.25, 1, 1, 1), color_blue));
+				//var mesh2=striker_wheel.clone()
+				if(side==='left'){
+				mesh2.rotation.y=180*Math.PI/180
+				mesh2.position.x=0.1
+				}
+				//mesh.add(mesh2)
+				range.add(mesh2);
+				return mesh2;
+			}
+
+var glftload = new THREE.GLTFLoader()
+var striker=null
+var striker_chassick=null
+var striker_wheel=null
+glftload.load(file.striker,(gltfScene)=>{
+striker=gltfScene.scene
+var spare_parts=0
+striker.traverse(child =>{
+
+if(child.isMesh){
+console.log(child.geometry.boundingSphere.radius)
+if(child.geometry.boundingSphere.radius<1){//0 пушка, 1 башня, 2 колесо, 3 корпус
+striker_wheel=child
+striker_wheel.rotation.y=180*Math.PI/180
+striker_wheel.position.y=-0.0
+}
+if(child.geometry.boundingSphere.radius>4){//0 пушка, 1 башня, 2 колесо, 3 корпус
+striker_chassick=child
+striker_chassick.rotation.y=180*Math.PI/180
+striker_chassick.position.z-=1.5
+striker_chassick.position.x-=0.1
+striker_chassick.position.y-=1.4
+}
+spare_parts++
+}
+});
+loading_resources.push(true)
+})
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+var gameready=false
+var animate=function() {
+requestAnimationFrame( animate );
+if(gameready===false){
+var game_ready=true
+for(var i=0;i<loading_resources_max;i++){
+//console.log(i)
+if(loading_resources[i]!==true){
+game_ready=false
+break
+}
+}
+if(game_ready===true){
+Ammo().then( function ( AmmoLib ) {
+Ammo = AmmoLib;
+collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
+broadphase = new Ammo.btDbvtBroadphase();
+solver = new Ammo.btSequentialImpulseConstraintSolver();
+physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+physicsWorld.setGravity( new Ammo.btVector3( 0, -9.82, 0 ) );
+TRANSFORM_AUX = new Ammo.btTransform();
+ZERO_QUATERNION = new THREE.Quaternion(0, 0, 0, 1);
+createBox(new THREE.Vector3(0, -1.5, -10), new THREE.Quaternion(0, 1, 1, 1), 5, 5, 5, 35);
+createBox(new THREE.Vector3(0, -25, 0), ZERO_QUATERNION, 50, 5, 50, 0,5);
+createVehicle(new THREE.Vector3(0, 4, 0), new THREE.Quaternion(0, 1, 0, 1));
+			
+} );
+gameready=true
+}
+}else{
+var chassick = new THREE.Vector3()
+striker_chassick.getWorldPosition(chassick)
+controls.target.set(chassick.x,chassick.y,chassick.z)
+controls.update();
+
+var dt = fyztime.getDelta();
+for (var i = 0; i < syncList.length; i++)
+syncList[i](dt);
+physicsWorld.stepSimulation( dt, 10 );
+renderer.render(range,camera)
+}
+}
+animate()
+</script>

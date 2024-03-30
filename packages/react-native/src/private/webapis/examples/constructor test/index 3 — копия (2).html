@@ -1,0 +1,296 @@
+<canvas id="ctx" width="500px" height="500px" style="position:absolute;top:0px;left:0px"></canvas>
+<div  style="position:absolute;top:0px;left:0px">
+<input id="detail" type="number" min="1"  step="1" value="17" style="width:60px"><br>
+<select id="setmaterial">
+<option value="MeshBasicMaterial">Простой</option>
+<option value="MeshLambertMaterial">Тень</option>
+<option value="MeshPhongMaterial">Тень+блики</option>
+<option value="MeshToonMaterial">Мультяшный</option>
+<option value="MeshStandardMaterial">Продвинутый</option>
+<option value="MeshPhysicalMaterial">Сложный</option>
+</select><input id="polygonmat" type="checkbox"><input id="linearmat" type="checkbox"><br>
+<select id="setgeometry">
+<option value="BoxGeometry">Прямоугольник</option>
+<option value="SphereGeometry">Шар</option>
+
+</select>
+<button id="create_spfere">создать</button>
+</div>
+<div id="spfere_setting" style="position:absolute;top:0px;right:0px;display:none">
+<input id="spfere_x" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_y" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_z" type="range" min="-15" max="15" step="1" value="0"><br><br>
+<input id="spfere_rx" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_ry" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_rz" type="range" min="-15" max="15" step="1" value="0"><br><br>
+<input id="spfere_sx" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_sy" type="range" min="-15" max="15" step="1" value="0"><br>
+<input id="spfere_sz" type="range" min="-15" max="15" step="1" value="0"><br><br>
+<input id="spfere_colorr" type="range" min="-0.1" max="0.1" step="0.01" value="0"><br>
+<input id="spfere_colorg" type="range" min="-0.1" max="0.1" step="0.01" value="0"><br>
+<input id="spfere_colorb" type="range" min="-0.1" max="0.1" step="0.01" value="0"><br><br>
+</div>
+<div id="light_setting" style="position:absolute;bottom:0px;left:0px;">
+<input id="background_color" type="color">
+<input id="alight_intensity" type="number" min="0"  step="0.01" value="0.2" style="width:60px">
+<input id="alight_color" type="color" value="#808080">
+<input id="dlight_intensity" type="number" min="0"  step="0.01" value="1.5" style="width:60px">
+<input id="dlight_color" type="color" value="#ffffff">
+<button id="dlight_pos">Задать положение света</button>
+</div>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="GLTFLoader.js"></script>
+
+<script src="cannon.min.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+var ctx = document.getElementById('ctx')//.getContext('2d')
+var WIDTH2 = window.innerWidth 
+var HEIGHT2 = window.innerHeight 
+  ctx.width  = WIDTH2
+  ctx.height = HEIGHT2
+var mousestate={}
+mousestate.down=false
+document.onmousedown=function(event){
+mousestate.down=true
+}
+document.onmouseup=function(event){
+mousestate.down=false
+spfere_x.value='0'
+objcontrol.x=0
+spfere_y.value='0'
+objcontrol.y=0
+spfere_z.value='0'
+objcontrol.z=0
+spfere_rx.value='0'
+objcontrol.rx=0
+spfere_ry.value='0'
+objcontrol.ry=0
+spfere_rz.value='0'
+objcontrol.rz=0
+spfere_sx.value='0'
+objcontrol.sx=0
+spfere_sy.value='0'
+objcontrol.sy=0
+spfere_sz.value='0'
+objcontrol.sz=0
+spfere_colorr.value='0'
+objcontrol.r=0
+spfere_colorg.value='0'
+objcontrol.g=0
+spfere_colorb.value='0'
+objcontrol.b=0
+}
+var rende = new THREE.WebGLRenderer({canvas:ctx})
+rende.setClearColor(0x000000)
+var scene = new THREE.Scene()
+var camera = new THREE.PerspectiveCamera(45, WIDTH2/HEIGHT2,0.1,5000)
+camera.position.set(14,19,217)
+
+//var laser = new THREE.AmbientLight(0xffffff)
+//scene.add(laser)
+    const color = 0xffffff;
+    const intensity = 1.5;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(5, 10, 2);
+    scene.add(light);
+    scene.add(light.target);
+var light0 = new THREE.AmbientLight(0x808080, 0.2);
+scene.add(light0);
+var objcontrol=null
+
+//var geametryS = new THREE.SphereGeometry(10,17,17)
+//var materialS = new THREE.MeshBasicMaterial({color:0x999999, wireframe:false})
+var ratespfere_x = document.querySelector('#spfere_x');
+spfere_x.addEventListener('input', function() { 
+var param=ratespfere_x.value -0
+objcontrol.x= param
+
+});
+var dlight_color1 = document.querySelector('#dlight_color');
+dlight_color.addEventListener('input', function() { 
+light.color=convector2(dlight_color1.value+'')
+
+});
+var dlight_intensity1 = document.querySelector('#dlight_intensity');
+dlight_intensity.addEventListener('input', function() { 
+light.intensity=dlight_intensity1.value
+
+});
+var alight_color1 = document.querySelector('#alight_color');
+alight_color.addEventListener('input', function() { 
+light0.color=convector2(alight_color1.value+'')
+
+});
+var alight_intensity1 = document.querySelector('#alight_intensity');
+alight_intensity.addEventListener('input', function() { 
+light0.intensity=alight_intensity1.value
+
+});
+var background_color1 = document.querySelector('#background_color');
+background_color.addEventListener('input', function() { 
+rende.setClearColor(background_color1.value)
+
+});
+
+var ratespfere_y = document.querySelector('#spfere_y');
+spfere_y.addEventListener('input', function() { 
+var param=ratespfere_y.value -0
+objcontrol.y= param
+});
+var ratespfere_z = document.querySelector('#spfere_z');
+spfere_z.addEventListener('input', function() { 
+var param=ratespfere_z.value -0
+objcontrol.z= param
+});
+var ratespfere_r = document.querySelector('#spfere_colorr');
+spfere_colorr.addEventListener('input', function() { 
+var param=ratespfere_r.value -0
+objcontrol.r= param
+});
+var ratespfere_g = document.querySelector('#spfere_colorg');
+spfere_colorg.addEventListener('input', function() { 
+var param=ratespfere_g.value -0
+objcontrol.g= param
+});
+var ratespfere_b = document.querySelector('#spfere_colorb');
+spfere_colorb.addEventListener('input', function() { 
+var param=ratespfere_b.value -0
+objcontrol.b= param
+});
+var ratespfere_rx = document.querySelector('#spfere_rx');
+spfere_rx.addEventListener('input', function() { 
+var param=ratespfere_rx.value -0
+objcontrol.rx= param
+});
+var ratespfere_ry = document.querySelector('#spfere_ry');
+spfere_ry.addEventListener('input', function() { 
+var param=ratespfere_ry.value -0
+objcontrol.ry= param
+});
+var ratespfere_rz = document.querySelector('#spfere_rz');
+spfere_rz.addEventListener('input', function() { 
+var param=ratespfere_rz.value -0
+objcontrol.rz= param
+});
+var ratespfere_sx = document.querySelector('#spfere_sx');
+spfere_sx.addEventListener('input', function() { 
+var param=ratespfere_sx.value -0
+objcontrol.sx= param
+});
+var ratespfere_sy = document.querySelector('#spfere_sy');
+spfere_sy.addEventListener('input', function() { 
+var param=ratespfere_sy.value -0
+objcontrol.sy= param
+});
+var ratespfere_sz = document.querySelector('#spfere_sz');
+spfere_sz.addEventListener('input', function() { 
+var param=ratespfere_sz.value -0
+objcontrol.sz= param
+});
+var oll = function(somp){
+var self=somp
+self.x=0
+self.y=0
+self.z=0
+self.rx=0
+self.ry=0
+self.rz=0
+self.sx=0
+self.sy=0
+self.sz=0
+self.getdistance = function(somp){
+		
+	}
+	return self;
+}
+var creatmat=function(){
+return new THREE[setmaterial.value]({color: '#888'})
+}
+var creatgeo=function(){
+return new THREE[setgeometry.value](10,detail.value-0,detail.value-0)
+}
+create_spfere.onclick=function(){
+//new THREE.MeshBasicMaterial({color:0x999999, wireframe:false})
+//new THREE.MeshPhongMaterial({color: '#8AC'})
+var mat=creatmat()
+var geo=creatgeo()
+var meshS1= new THREE.Mesh(geo,mat)
+var meshS=oll(meshS1)
+
+scene.add(meshS)
+objcontrol=meshS
+//objcontrol.material.color=0x888888
+objcontrol.material.metalness=0.9
+objcontrol.material.roughness=0.3
+objcontrol.material.wireframe=linearmat.checked
+objcontrol.material.flatShading=polygonmat.checked
+/*
+meshS.x=0
+meshS.y=0
+meshS.z=0
+meshS.rx=0
+meshS.ry=0
+meshS.rz=0
+meshS.sx=0
+meshS.sy=0
+meshS.sz=0
+*/
+meshS.r=0
+meshS.g=0
+meshS.b=0
+
+spfere_setting.style.display='inline'
+}
+var convector=function(c) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(c);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+var convector2=function(c){
+var asd=convector(c)
+asd.r=asd.r/255
+asd.g=asd.g/255
+asd.b=asd.b/255
+return asd
+}
+dlight_pos.onclick=function(){
+light.position.set(camera.position.x,camera.position.y,camera.position.z)
+}
+var controls = new THREE.OrbitControls(camera, ctx);
+controls.update();
+var world = new CANNON.World() 
+            world.broadphase = new CANNON.SAPBroadphase(world);
+world.gravity.set(0, -9.8, 0) 
+            world.defaultContactMaterial.friction = 0;
+var CannonDebugRenderer = new THREE.CannonDebugRenderer(scene, world)
+
+
+setInterval(function(){
+if(objcontrol!==null&&mousestate.down===true){
+objcontrol.position.x+=objcontrol.x
+objcontrol.position.y+=objcontrol.y
+objcontrol.position.z+=objcontrol.z
+objcontrol.rotation.x+=objcontrol.rx/100
+objcontrol.rotation.y+=objcontrol.ry/100
+objcontrol.rotation.z+=objcontrol.rz/100
+objcontrol.scale.x+=objcontrol.sx/100
+objcontrol.scale.y+=objcontrol.sy/100
+objcontrol.scale.z+=objcontrol.sz/100
+objcontrol.material.color.r+=objcontrol.r
+objcontrol.material.color.g+=objcontrol.g
+objcontrol.material.color.b+=objcontrol.b
+}
+
+world.step(1 / 60)		
+
+CannonDebugRenderer.update()
+rende.render(scene,camera)
+
+
+},1000/25)
+</script>

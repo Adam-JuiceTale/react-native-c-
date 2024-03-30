@@ -1,0 +1,95 @@
+<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+<canvas id="ctx"></canvas>
+		<div id="container"></div>
+<script src="../build/three.min.js"></script>
+
+<script src="js/libs/GLTFLoader.js"></script>
+<script src="js/libs/ammo.js"></script>
+<script src="js/base64.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+var renderer = new THREE.WebGLRenderer({canvas:ctx})
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(0,0,0)
+var hangar = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+hangar.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,0.2)
+hangar.add(ambientl)
+var color_green = new THREE.MeshBasicMaterial({color:0x7fe000})
+var color_blue = new THREE.MeshBasicMaterial({color:0x0588e6})
+var color_purple = new THREE.MeshBasicMaterial({color:0x9305e6})
+
+var geometryball=new THREE.SphereGeometry(1,32,16)
+var geometryblock=new THREE.BoxGeometry(1,1,1)
+var ploskost=new THREE.PlaneGeometry(1,1,1,1)
+
+var nusha = new THREE.Mesh(geometryball,color_purple)
+
+var	collisionConfiguration=null
+var	dispatcher=null
+var	broadphase=null
+var	solver=null
+var	physicsWorld=null
+var fyztime = new THREE.Clock()
+Ammo().then( function ( AmmoLib ) {
+Ammo = AmmoLib;
+collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
+broadphase = new Ammo.btDbvtBroadphase();
+solver = new Ammo.btSequentialImpulseConstraintSolver();
+physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+physicsWorld.setGravity( new Ammo.btVector3( 0, -9.82, 0 ) );
+} );
+var glftload = new THREE.GLTFLoader()
+
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+setInterval(function(){
+physicsWorld.stepSimulation( fyztime, 10 );
+renderer.render(hangar,camera)
+},1000/50)
+
+</script>
