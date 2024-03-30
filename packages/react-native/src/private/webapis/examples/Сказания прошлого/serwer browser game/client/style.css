@@ -1,0 +1,400 @@
+body{
+font-family: 'Reggae One', cursive;
+background: black;
+}
+
+ .col-form-label-sm{
+ padding-top:calc(.25rem + 1px);
+ padding-bottom:calc(.25rem + 1px);
+ font-size:1rem;
+ line-height:1.1
+ }
+
+.image{
+width: 100%;
+max-width: 1500px;
+margin: 0 auto;
+height: 100vh;
+
+background: url("img/jg-ballard-21.jpg") center no-repeat;
+-webkit-background-size: cover;
+background-size: cover;
+}
+
+.top{
+width: 100%;
+max-width: 1381px;
+height: 350px;
+margin: 0 auto;
+
+background: url("img/rage-of-apocalipsistic-desert.png") center no-repeat;
+/*-webkit-background-size: cover;/**/
+/*background-size: cover;/**/
+}
+.hed{
+/*width: 100%;/**/
+/*max-width: 1200px;/**/
+/*margin: 0 auto;/**/
+}
+.menu{
+display: flex;
+justify-content: space-between;
+margin-left:20px;
+margin-right:20px;
+}
+.menubutton{
+font-family: 'Reggae One', cursive;
+font-size: 100%;
+cursor: pointer;
+background-color: rgba(28,28,28,0);
+color: #e13602;
+border: 0px solid;
+border-left: 1px solid;
+border-right: 1px solid;
+/*background: #fc3;  Цвет фона */
+    padding: 27px;/* box-shadow: inset 0px 0px 65px 0px #e5ff60,0px 0px 65px 0px #e5ff60; Поля вокруг текста */
+text-align: center;
+width: 25%;
+transition: 0.50s;
+/*-webkit-text-stroke: 1px black;*/
+
+}
+.menubutton:hover{
+	  box-shadow: inset 0px 0px 85px 85px #e5ff60,0px 0px 80px 15px #e5ff60;
+	  transform:scale(0.7,0.7);
+	  -webkit-transform:scale(0.7,0.7);
+	  -moz-transform:scale(0.7,0.7);
+	 
+}
+.menubutton:focus{
+	  box-shadow: inset 0px 0px 85px 85px #ffe260,0px 0px 80px 15px #ffe260;
+	  transform:scale(0.7,0.7);
+	  -webkit-transform:scale(0.7,0.7);
+	  -moz-transform:scale(0.7,0.7);
+	 
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 500px;
+    background-color: black;
+    color: #fff491;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.textcontent {
+    padding: 5px; /* Поля вокруг текста */
+    background: rgba(0, 0, 0, 0.4); /* Цвет фона */
+    margin: 0 auto; /* Выравниваем слой по центру */
+    width: 80%; /* Ширина слоя */
+    
+    filter: alpha(Opacity=70); /* Прозрачность в IE */
+	color: #fff;
+   }
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+.st0{fill:#669930;}
+.st1{fill:#8AC752;}
+.custom-btn {
+  width: 270px;
+  height: 80px;
+  color: #fff;
+  transform: skewX(-15deg);
+  border-radius: 0px;
+  padding: 10px 25px;
+  font-family: 'Lato', sans-serif;
+  font-size: 45px;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+   box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+   7px 7px 20px 0px rgba(0,0,0,.1),
+   4px 4px 5px 0px rgba(0,0,0,.1);
+  outline: none;
+}
+
+/* 11 */
+.btn-11 {
+  border: none;
+  background: rgb(255,79,0);
+    background: linear-gradient(0deg, rgba(255,79,0,1) 0%, rgba(227,179,53,1) 100%);
+    color: #fff;
+    overflow: hidden;
+}
+.btn-11:hover {
+    text-decoration: none;
+    color: #fff;
+}
+.btn-11:before {
+    position: absolute;
+    content: '';
+    display: inline-block;
+    top: -180px;
+    left: 0;
+    width: 30px;
+    height: 100%;
+    background-color: #fff;
+    animation: shiny-btn1 3s ease-in-out infinite;
+}
+.btn-11:hover{
+  opacity: .7;
+}
+.btn-11:active{
+  box-shadow:  4px 4px 6px 0 rgba(255,255,255,.3),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.2),
+    inset 4px 4px 6px 0 rgba(0, 0, 0, .2);
+}
+
+
+@-webkit-keyframes shiny-btn1 {
+    0% { -webkit-transform: scale(0) rotate(45deg); opacity: 0; }
+    80% { -webkit-transform: scale(0) rotate(45deg); opacity: 0.5; }
+    81% { -webkit-transform: scale(4) rotate(45deg); opacity: 1; }
+    100% { -webkit-transform: scale(50) rotate(45deg); opacity: 0; }
+}
+#login {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+      #okno {
+        width: 450px;
+        height: 550px;
+		background: url("/client/img/reg.png") center no-repeat;
+        text-align: center;
+        padding: 15px;
+       /* border: 3px solid #ff6d24;/**/
+       /* border-radius: 10px;/**/
+        color: #ff6d24;
+		text-shadow: -1px -1px black, 1px 1px black;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        
+      }
+	  #okno2 {
+        width: 650px;
+        height: 550px;
+		background: url("/client/img/play.png") center no-repeat;
+        text-align: center;
+        padding: 15px;
+       /* border: 3px solid #ff6d24;/**/
+       /* border-radius: 10px;/**/
+        color: #ff6d24;
+		text-shadow: 0px -1px black, -1px 0px black, 0px 1px black, 1px 0px black;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        
+      }
+	  	  #okno3 {
+        width: 720px;
+        height: 480px;
+		
+        text-align: center;
+        padding: 15px;
+       /* border: 3px solid #ff6d24;/**/
+       /* border-radius: 10px;/**/
+        color: #ff6d24;
+		text-shadow: 0px -1px black, -1px 0px black, 0px 1px black, 1px 0px black;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        
+      }
+#login:target {display: block;}
+	  .close {
+        display: inline-block;
+        border: 1px solid #ff6d24;
+        color: #ff6d24;
+        padding: 0 12px;
+        margin-top: 10px;
+        text-decoration: none;
+        background: #f2f2f2;
+        font-size: 14pt;
+        cursor:pointer;
+      }
+      .close:hover {background: #e6e6ff;}
+	  
+#signup {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+#signup:target {display: block;}
+#play {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+#play:target {display: block;}
+#video1 {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+	  #video2 {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+	  #video3 {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+	  #video4 {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+	  	  #regmail {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+	  	  #regsuccess {
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+#video1:target {display: block;}
+#video2:target {display: block;}
+#video3:target {display: block;}
+#video4:target {display: block;}
+#regmail:target {display: block;}
+#regsuccess:target {display: block;}
+.video {
+    background: #d9dabb; /* Цвет фона */
+    width: 350px; /* Ширина */
+    margin: 0 10px 10px 0; /* Отступы */
+    padding: 10px 0; /* Поля сверху и снизу */
+    text-align: center; /* Выравнивание по центру */
+    display: inline-block; /* Строчно-блочный элемент */
+   }
+   .video img {
+    border: 2px solid #8b8e4b; /* Параметры рамки */
+   }
+   .video p {
+    margin: 0; /* Отступы */
+   }
+	  /* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 19px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #ff6d24;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #ff6d24;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

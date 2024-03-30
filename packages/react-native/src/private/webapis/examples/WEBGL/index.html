@@ -1,0 +1,53 @@
+<canvas id="ctx" width="500px" height="500px"></canvas>
+
+<script>
+
+var vertsh=`
+precision mediump float;
+
+attribute vec2 verPosition;
+void main(){
+gl_Position = vec4(verPosition,0.0,1.0);
+}
+
+`
+
+var fragsh=`
+precision mediump float;
+
+
+void main(){
+gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+}
+
+`
+//var fragsh=
+var ctx=document.getElementById('ctx').getContext('webgl')
+ctx.clearColor(0.2,0.2,0.2,1)//цвет заднего фона после очистки
+ctx.clear(ctx.COLOR_BUFFER_BIT)//очистить слой
+var shader = ctx.createShader(ctx.VERTEX_SHADER)
+var shader2 = ctx.createShader(ctx.FRAGMENT_SHADER)
+ctx.shaderSource(shader,vertsh)
+ctx.shaderSource(shader2,fragsh)
+ctx.compileShader(shader)
+ctx.compileShader(shader2)
+var googo=ctx.createProgram()
+ctx.attachShader(googo,shader)
+ctx.attachShader(googo,shader2)
+ctx.linkProgram(googo)
+ctx.validateProgram(googo)
+//var grid=[]
+var VaRR=new Float32Array([
+0.0,0.5,
+-0.1,-0.5,
+0.1,-0.5
+]);
+var bufervi=ctx.createBuffer()
+ctx.bindBuffer(ctx.ARRAY_BUFFER,bufervi)
+ctx.bufferData(ctx.ARRAY_BUFFER,VaRR,ctx.STATIC_DRAW)
+var poss = ctx.getAttribLocation(googo,'verPosition')
+ctx.vertexAttribPointer(poss,2,ctx.FLOAT,ctx.FALSE,Float32Array.BYTES_PER_ELEMENT*2,0)
+ctx.enableVertexAttribArray(poss)
+ctx.useProgram(googo)
+ctx.drawArrays(ctx.TRIANGLES,0,3)
+</script>
