@@ -1,0 +1,445 @@
+<head>
+<link rel="stylesheet" href="client/style.css">
+<!-- <link rel="stylesheet" href="client/bootstrap.min.css"> -->
+<title>R.O.A.D.</title>
+<meta name="Description" content="Rage Of Apocalipsistic Desert">
+   <meta name="Keywords" content="браузерная рпг, постапокалипсис, тачки"> 
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet">
+</head>
+<body link="#E3B335" vlink="#FF4F00" alink="#ff0000">
+<div id="game" style="display:none;position:absolute;top:0px;left:0px;background: orange;">
+<canvas id="ctx"></canvas>
+<canvas id="ctxhud" style="position:absolute;top:0px;left:0px;display:none"></canvas>
+<div id="chatleft" style="position:absolute;top:0px;right:0px;">
+<div id="chat1" style="width:200px;height:400px;overflow-y:scroll;background:#00223d">
+	<div></div>
+</div>
+<form id="chat3">
+<input id="chat2" type="text" style="width:200px"></input>
+</form>
+</div>
+<button id="back" style="position:absolute;top:0px;right:200px;">back</button>
+</div>
+<div class="image" id="site" >
+
+
+<button id="loginbutton1" style="border: 1px solid;border-radius: 5px 0px 0px 5px;border-right: 0px solid;cursor: pointer;position:absolute;right:70px;background-color: #e08d3a;">
+        <svg id="search-icon" style="width: 1.rem; height: 1.3rem;" viewBox="0 0 24 24">
+            <path d="
+  M 12 2 
+  C 6.48 2 2 6.48 2 12 
+  c 0 5.52 4.48 10 10 10 
+  s 10 -4.48 10 -10 
+  C 22 6.48 17.52 2 12 2 
+  Z 
+  M 12 3 
+  c 4.96 0 9 4.04 9 9 
+  c 0 1.42 -0.34 2.76 -0.93 3.96 
+  c -1.53 -1.72 -3.98 -2.89 -7.38 -3.03 
+  C 14.57 12.6 16 10.97 16 9 
+  c 0 -2.21 -1.79 -4 -4 -4 
+  C 9.79 5 8 6.79 8 9 
+  c 0 1.97 1.43 3.6 3.31 3.93 
+  c -3.4 0.14 -5.85 1.31 -7.38 3.03 
+  C 3.34 14.76 3 13.42 3 12 
+  C 3 7.04 7.04 3 12 3 
+  Z 
+  M 9 9 
+  c 0 -1.65 1.35 -3 3 -3 
+  s 3 1.35 3 3 
+  c 0 1.65 -1.35 3 -3 3 
+  S 9 10.65 9 9 
+  Z 
+  M 12 21 
+  c -3.16 0 -5.94 -1.64 -7.55 -4.12 
+  C 6.01 14.93 8.61 13.9 12 13.9 
+  c 3.39 0 5.99 1.03 7.55 2.98 
+  C 17.94 19.36 15.16 21 12 21 
+  Z
+  M 6 20
+  C 9 16 15 16 18 20
+  L 18 19
+  C 15 15 9 15 6 19
+  Z
+  M 8 18
+  C 10 21 14 21 16 18
+  L 18 20
+  C 14 21 10 21 6 20
+  Z
+  "/>
+           
+        </svg>
+		
+    </button>
+	<button id="loginbutton" style="border: 1px solid;border-radius: 0px 5px 5px 0;border-left: 0px solid; margin-left:-4px;cursor: pointer;position:absolute;right:20px;background-color: #e08d3a;">
+        <svg id="search-icon" style="width: 2.4rem; height: 1.3rem;" >
+            
+           <text x="0" y="15">Войти</text>
+        </svg>
+		
+    </button>
+<div class="top" >
+
+</div>
+
+
+
+<div class="menu">
+<input type="button" id="news" class="menubutton" style="border-left: 0px solid;" value="Новости"/>
+<input type="button" id="about_game" class="menubutton" value="Об игре"/>
+<input type="button" id="media" class="menubutton" value="Медиа"/>
+<input type="button" id="forum" class="menubutton" style="border-right: 0px solid;"  value="Форум"/>
+
+</div>
+<div id="mainp">
+
+<div style="display: flex; justify-content: center">
+<button id="playbutton" class="custom-btn btn-11">Играть</button>
+</div>
+</div>
+<div id="newsp" style="display:none;">
+news
+</div>
+<div id="about_gamep" style="display:none;">
+<div class="textcontent">
+<p  >Создано в комерчиских целях <a href="https://www.avito.ru/ekaterinburg/rezume/proger_1234567890" target="_blank">https://www.avito.ru/ekaterinburg/rezume/proger_1234567890</a><br><br>
+Вся логика игры реализована на языке JavaScript.<br> Для отрисовки игрового мира используется холст &lt;canvas&gt;(.ctx).<br> Серверная часть игры реализована на Node.js.<br> Node.js работает в связке с библиотеками Express.js и Socket.IO.<br> База данных - MongoDB.<br><br>
+Rage of apocalipsistic desert (Ярость апокалипсистической пустыни) Браузерная 2D мморпг с открытым миром! Прокачивай тачки, находи новое оружие, учавствуй в маштабных ПвП и ПвЕ сражениях, вступай в кланы с друзьями! Множество эпических квестов недадут тебе заскучать. Присоеденяйся к нам прямо сейчас!</p> 
+</div>
+</div>
+<div id="mediap" style="display:none;">
+<!--
+<a href="#video1" id="playYoutube">
+<div class="video">
+   <p><img src="//img.youtube.com/vi/D_HhWS3fC6k/mqdefault.jpg" width="320" height="180"></p>
+   <p class="discript">Convoy: A Tactical Roguelike - Launch Trailer</p>
+  </div>
+  </a>
+  <a href="#video2">
+  <div class="video">
+   <p><img src="//img.youtube.com/vi/2t_tyv4g-2M/mqdefault.jpg" width="320" height="180"></p>
+   <p class="discript">NES Longplay [298] Mad Max</p>
+  </div>
+  </a>
+  <a href="#video3">
+  <div class="video">
+   <p><img src="//img.youtube.com/vi/yH4s5t4htxM/mqdefault.jpg" width="320" height="180"></p>
+   <p class="discript">Auto Fire - (Mad Max Style Roguelike Game)</p>
+  </div>
+  </a>
+  <a href="#video4">
+  <div class="video">
+   <p><img src="//img.youtube.com/vi/qNS_uta68Zg/mqdefault.jpg" width="320" height="180"></p>
+   <p class="discript">Death Skid Marks [Gameplay PC]</p>
+  </div>
+  </a>
+-->
+</div>
+<div id="forump" style="display:none;">
+forum
+</div>
+<div id="login">
+      <div id="okno">
+	  <br>
+	  <a href="#" id="closebutton1" class="close" style="margin-top: -25px;margin-left: 285px;">X</a><br>
+        Всплывающее окошко!<br>
+
+		 <input id="signdiv-user"  style="margin-top: 25px;" type="text" placeholder="@меил"></input><br>
+		 <input id="signdiv-pass" style="margin-top: 25px;" type="password" placeholder="Пароль"></input><br>
+		 Использовать куки<br>для авторизации ?<br>
+<label class="switch">
+  <input type="checkbox" id="swichcookie">
+  <span class="slider round"></span>
+</label><br>
+		 <input type="button" id="signdiv-in" class="close" value="Войти"/></input><br><br>
+		 <a href="#signup" style="margin-left:150px;color: #ff6d24;">Ещё нет аккаунта ?</a><br>
+        
+      </div>
+    </div>
+
+<div id="signup">
+      <div id="okno" >
+	  
+	  <form method="POST" action="/reg">
+	  <a href="#" id="closebutton2" class="close" style="margin-top: -15px;margin-left: 285px;">X</a><br>
+        
+		 <input style="margin-top: 25px;" class="col-form-label-sm" type="text" name="nickname" placeholder="Ник" pattern="^[a-zA-Z0-9]+$" required></input><br>
+		 <input style="margin-top: 25px;" class="col-form-label-sm" type="email" name="mail" placeholder="@меил" required></input><br>
+		 <div class="tooltip">
+		 <input id="signdiv-user1" class="col-form-label-sm" style="margin-top: 25px;background-color: #fff491;" type="password" name="pass1" placeholder="Пароль" required></input><br>
+		 <span class="tooltiptext">Мы не используем bcrypt, для шифрования ваших паролей, так что рекомендуем не использовать личные пароли!</span>
+		 </div><br>
+		 <div class="tooltip">
+		 <input id="signdiv-pass1" class="col-form-label-sm" style="margin-top: 25px;background-color: #fff491;" type="password" name="pass2" placeholder="Повтор пароля" required></input><br>
+		 <span class="tooltiptext">Мы не используем bcrypt, для шифрования ваших паролей, так что рекомендуем не использовать личные пароли!</span>
+		 </div><br>
+		 <input type="submit" id="signdiv-up" class="close" value="Зарегистрироватся"/></input><br>
+		 <a href="#login" style="margin-left:150px;color: #ff6d24;">Уже есть аккаунт ?</a><br>
+        </form>
+      </div>
+    </div>
+<div id="play">
+      <div id="okno2">
+	  <br><br><br><br><br>
+	  <a href="#" id="closebutton3" class="close" style="margin-top: 0px;margin-left: 570px;">X</a><br>
+        <a href="#login" style="color: #ff6d24;">Войти</a>/<a href="#signup" >Зарегестрироватся</a><br>
+		 --------------------------------------------------------
+		 <input type="button" id="signdivplay" class="close" value="Играть сейчас! Регистрация потом"/></input><br>
+		 
+        
+      </div>
+    </div>
+	<div id="video1">
+      <div id="okno3">
+	  <a href="#" id="closevideo1" class="close" style="margin-top: -30px;margin-left: 700px;">X</a>
+	  <!--<iframe width="720" height="480" src="https://www.youtube.com/embed/D_HhWS3fC6k?rel=0&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" id="Youtube" allowfullscreen></iframe>-->
+      </div>
+    </div>
+	<div id="video2">
+      <div id="okno3">
+	  <a href="#" class="close" style="margin-top: -30px;margin-left: 700px;">X</a>
+	  <!--<iframe width="720" height="480" src="https://www.youtube.com/embed/2t_tyv4g-2M?rel=0&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" id="Youtube" allowfullscreen></iframe>-->
+      </div>
+    </div>
+	<div id="video3">
+      <div id="okno3">
+	  <a href="#" class="close" style="margin-top: -30px;margin-left: 700px;">X</a>
+	  <!--<iframe width="720" height="480" src="https://www.youtube.com/embed/yH4s5t4htxM?rel=0&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" id="Youtube" allowfullscreen></iframe>-->
+      </div>
+    </div>
+	<div id="video4">
+      <div id="okno3">
+	  <a href="#" class="close" style="margin-top: -30px;margin-left: 700px;">X</a>
+	  <!--<iframe width="720" height="480" src="https://www.youtube.com/embed/qNS_uta68Zg?rel=0&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" id="Youtube" allowfullscreen></iframe>-->
+      </div>
+    </div>
+		<div id="regmail">
+      <div id="okno2">
+	  <br><br><br><br>
+	  <a href="#" class="close" style="margin-top: 0px;margin-left: 570px;">X</a>
+	  <h2 style="margin-left:70px;margin-right:70px">Письмо, со ссылкой на активацию аккаунта, было отправленно на указанную вами почту.</h2>
+      </div>
+    </div>
+		<div id="regsuccess">
+      <div id="okno2">
+	  <br><br><br><br>
+	  <a href="#" class="close" style="margin-top: 0px;margin-left: 570px;">X</a>
+	 <h1 style="margin-left:70px;margin-right:70px">Поздравляем, вы зарегестрированы!</h1>
+      </div>
+    </div>
+
+
+</div>
+<script src="/client/socket.io-3.0.5.js"></script>
+<script src="/client/code/three.min.js"></script>
+<script src="/client/code/OrbitControls.js"></script>
+<script src="/client/code/GLTFLoader.js"></script>
+<script src="/client/code/OBJLoader.js"></script>
+<script src="/client/code/MTLLoader.js"></script>
+<script src="/client/code/cannon.min.js"></script>
+<script src="/client/code/CannonDebugRenderer.js"></script>
+<script src="/client/code/var.js"></script>
+<script src="/client/code/ctx.js"></script>
+<script src="/client/code/sound.js"></script>
+<script src="/client/code/input.js"></script>
+<script src="/client/code/output.js"></script>
+<script src="/client/code/core.js"></script>
+
+<!--<script src="https://www.youtube.com/player_api"></script>-->
+<script>
+
+
+
+
+news.onclick = function(){
+mainp.style.display = 'none';
+about_gamep.style.display = 'none';
+mediap.style.display = 'none';
+forump.style.display = 'none';
+newsp.style.display = 'inline-block';
+
+}
+about_game.onclick = function(){
+mainp.style.display = 'none';
+newsp.style.display = 'none';
+mediap.style.display = 'none';
+forump.style.display = 'none';
+about_gamep.style.display = 'inline-block';
+}
+media.onclick = function(){
+mainp.style.display = 'none';
+newsp.style.display = 'none';
+about_gamep.style.display = 'none';
+forump.style.display = 'none';
+mediap.style.display = 'inline-block';
+}
+forum.onclick = function(){
+mainp.style.display = 'none';
+newsp.style.display = 'none';
+mediap.style.display = 'none';
+about_gamep.style.display = 'none';
+forump.style.display = 'inline-block';
+}
+
+
+GetCookie = function(name) {
+var cookie = " " + document.cookie;
+var search = " " + name + "=";
+var setStr = null;
+var offset = 0;
+var end = 0;
+if (cookie.length > 0) {
+offset = cookie.indexOf(search);
+if (offset != -1) {
+offset += search.length;
+end = cookie.indexOf(";", offset)
+if (end == -1) {
+end = cookie.length;
+}
+setStr = unescape(cookie.substring(offset, end));
+}
+}
+return(setStr);
+}
+
+var cookielog2 = GetCookie('cookielogin');
+var cookiepass2 = GetCookie('cookiepass');
+signdivuser.value = cookielog2
+signdivpass.value = cookiepass2
+var cookiecheck2 = GetCookie('cookieswich');
+if(cookiecheck2 === 'swichcookiechecked'){
+swichcookie.checked = true
+
+}else{
+swichcookie.checked = false; 
+
+}
+//if(cookiecheck2 === 'swichcookiechecked'){
+//socket.emit('login',{mail:signdivuser.value,password:signdivpass.value});
+//}
+
+signdivin.onclick = function(){
+if(swichcookie.checked){
+document.cookie = encodeURIComponent('cookielogin') + '=' + encodeURIComponent(signdivuser.value);
+document.cookie = encodeURIComponent('cookiepass') + '=' + encodeURIComponent(signdivpass.value);
+document.cookie = encodeURIComponent('cookieswich') + '=' + encodeURIComponent('swichcookiechecked');
+
+}else{
+document.cookie = encodeURIComponent('cookieswich') + '=' + encodeURIComponent('swichcookienotchecked');
+
+}
+socket.emit('login',{mail:signdivuser.value,password:signdivpass.value});
+}
+signdivplay.onclick = function(){
+document.getElementById("closebutton3").click(); 
+sitediv.style.display = 'none';
+gamediv.style.display = 'inline-block';
+socket.emit('playbutton',{status:true})
+}
+
+socket.on('signin',function(somp){
+if(somp.status === true){
+loginbutton.innerHTML = '<svg id="search-icon" style="width: 2.4rem; height: 1.3rem;" ><text x="0" y="15">'+somp.login+'</text></svg>'
+logined = true;
+location.href='#';
+if(startgameouterlogging === true){
+sitediv.style.display = 'none';
+gamediv.style.display = 'inline-block';
+socket.emit('playbutton',{status:true})
+//sound.engine_WLA_42.volume = 0.4;
+//sound.engine_WLA_42.play();
+startgameouterlogging = false;
+}
+}
+else if(somp.status === false){
+loginbutton.innerHTML = '<svg id="search-icon" style="width: 2.4rem; height: 1.3rem;" ><text x="0" y="15">Войти</text></svg>'
+logined = false;
+console.log('netu')
+sitediv.style.display = 'block';
+gamediv.style.display = 'none';
+alert("Неверный логин или пароль");
+}
+});
+
+loginbutton.onclick = function(){
+if(logined === true){
+
+}else{
+location.href='#login';
+}
+}
+loginbutton1.onclick = function(){
+if(logined === true){
+
+}else{
+location.href='#login';
+}
+}
+playbutton.onclick = function(){
+if(logined === true){
+
+document.getElementById("closebutton3").click(); 
+sitediv.style.display = 'none';
+gamediv.style.display = 'inline-block';
+socket.emit('playbutton',{status:true})
+//sound.engine_WLA_42.volume = 0.4;
+//sound.engine_WLA_42.play();
+}else{
+location.href='#play';
+startgameouterlogging = true;
+}
+}
+
+closebutton1.onclick = function(){
+startgameouterlogging = false;
+}
+
+closebutton2.onclick = function(){
+startgameouterlogging = false;
+}
+
+closebutton3.onclick = function(){
+startgameouterlogging = false;
+}
+
+document.getElementById('back').onclick = function(){
+sitediv.style.display = 'block';
+//sitediv.style.width '100%';
+//sitediv.style.max-width '1500px';
+//sitediv.style.margin '0';
+//sitediv.style.height '100vh';
+gamediv.style.display = 'none';
+socket.emit('playbutton',{status:false})
+}
+
+
+
+/*
+socket.on('update',function(somp){
+ctx.clearRect(0,0,2000,2000)
+for(var i = 0 ; i < somp.length; i++){
+
+ctx.drawImage(image.body_muslcar,somp[i].x,0)
+ctx.fillText(somp[i].name,somp[i].x+20,20)
+}
+})
+*/
+
+/*
+function onYouTubePlayerAPIReady() {
+  player = new YT.Player('Youtube', {
+    events: {'onReady': onPlayerReady}
+  });
+}
+function onPlayerReady(event) {
+  document.getElementById("playYoutube").addEventListener("click", function() {player.playVideo();});
+  document.getElementById("closevideo1").addEventListener("click", function() {player.pauseVideo();});
+}
+*/
+
+
+
+</script>
+</body>
