@@ -1,0 +1,445 @@
+<style>
+body {
+margin:0;
+}
+</style>
+<canvas id="ctx3d"></canvas>
+
+<!--<canvas id="ctx" style="position:absolute; top:0px;left:0px"></canvas>-->
+<button id="but1"style="position:absolute;top:500px;left:0px">sd</button>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="GLTFLoader.js"></script>
+<script src="cannon.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+var width2 = window.innerWidth 
+var height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//var ctx = document.getElementById('ctx').getContext('2d')
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+window.addEventListener('resize',function(){//изменение размера окна
+width2 = window.innerWidth 
+height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+})
+
+var color_green = new THREE.MeshLambertMaterial({color:0x35382f})//материал
+var color_blue = new THREE.MeshBasicMaterial({color:0x0588e6})//материал
+var color_purple = new THREE.MeshBasicMaterial({color:0x9305e6})//материал
+var gray = new THREE.MeshLambertMaterial({color: 'red'})
+var geometryball=new THREE.SphereGeometry(11,32,32)//геометрия
+var geometryblock=null//
+var ploskost=new THREE.PlaneGeometry(550,550,32,32)//геометрия
+
+var nusha = new THREE.Mesh(geometryball,gray)//меш
+var krosh = new THREE.Mesh(geometryball,color_blue)//меш
+var poll = new THREE.Mesh(ploskost,color_green)//меш
+poll.rotation.x=-Math.PI/2
+nusha.position.y=15
+nusha.position.x=115
+
+
+
+var rendrer = new THREE.WebGLRenderer({canvas:ctx3d})
+//rendrer.setClearColor(0x00ff00)
+var camera = new THREE.PerspectiveCamera(45,width2/height2,0.1,5000)
+camera.position.set(0,14,10)
+
+//camera.rotation.set(0,0.2,0)
+var scena = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffe3b0, 2);
+    light.position.set(0, 10, 0);
+    scena.add(light);
+    scena.add(light.target);
+var ambientl = new THREE.AmbientLight(0xffffff,0.5)
+scena.add(ambientl)
+scena.add(nusha)
+scena.add(poll)
+var glftload = new THREE.GLTFLoader()
+var tank8bit = false
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_chassis.gltf',(gltfScene1)=>{
+tank8bit=gltfScene1
+gltfScene1.scene.scale.set(0.2, 0.2, 0.2);
+//gltfScene1.scene.position.z=-4
+//tank8bit.scene.quaternion.x=2
+//gltfScene1.scene.rotation.y=90*Math.PI/180
+scena.add(gltfScene1.scene);
+//gltfScene1.scene.visible=false
+connecttank=true
+
+tank8bit.scene.add(engine)
+})
+var tower8bit = false
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_tower.gltf',(gltfScene1)=>{
+tower8bit=gltfScene1
+//gltfScene1.scene.scale.set(0.4, 0.4, 0.4);
+gltfScene1.scene.position.z=+3
+//gltfScene1.scene.position.x=4
+//tank8bit.scene.quaternion.x=2
+gltfScene1.scene.rotation.z=-90*Math.PI/180
+scena.add(gltfScene1.scene);
+//gltfScene1.scene.visible=false
+tank8bit.scene.add(tower8bit.scene)
+})
+var dulo = new THREE.BoxGeometry( 2, 2, 30 ); 
+var stvol = null //new THREE.Mesh(dulo,gray)
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_gun.gltf',(gltfScene1)=>{
+stvol=gltfScene1
+//gltfScene1.scene.scale.set(0.4, 0.4, 0.4);
+//gltfScene1.scene.position.z=-3
+//gltfScene1.scene.position.x=4
+//tank8bit.scene.quaternion.x=2
+//gltfScene1.scene.rotation.y=-90*Math.PI/180
+stvol.scene.rotation.y-=90*Math.PI/180
+stvol.scene.position.x-=15/2
+stvol.scene.position.z+=2
+scena.add(gltfScene1.scene);
+//gltfScene1.scene.visible=false
+tower8bit.scene.add(stvol.scene)
+stvol.scene.add(shot)
+})
+//scena.add(stvol);
+
+//stvol.scene.position.x-=15
+//stvol.scene.position.z+=4
+var controls = new THREE.OrbitControls(camera, ctx3d);
+
+var worldf = new CANNON.World() 
+    worldf.gravity.set(0, -9.8, 0) 
+var groundf = new CANNON.Body({
+type: CANNON.Body.STATIC,
+shape: new CANNON.Plane(),
+})
+groundf.quaternion.setFromEuler(-Math.PI/2,0,0)
+worldf.addBody(groundf)
+var radiussperef = 1
+var options = {
+                radius: 0.5,//размер колёс
+                directionLocal: new CANNON.Vec3(0, -1, 0),//направление, от какой стороны, колёса будут армотезировать
+                suspensionStiffness: 30,//жезкость подвески
+                suspensionRestLength: 0.3,//восстановление подвески
+                frictionSlip: 1,//сцепление колес
+                dampingRelaxation: 2.3,//армотизаторы востановление
+                dampingCompression: 1.4,//армотизаторы сжатие
+                maxSuspensionForce: 100000,//максимальная сила подвески
+                rollInfluence:  0.01,
+                axleLocal: new CANNON.Vec3(0, 0, 1),//0, 1, 0//ось вращения колёс
+                chassisConnectionPointLocal: new CANNON.Vec3(0, 0, 0),//хз
+                maxSuspensionTravel: 0.3,//макс. ход подвески
+                customSlidingRotationalSpeed: -3,//пользовательская скорость вращения скольжения
+                useCustomSlidingRotationalSpeed: true
+            };
+var cubeBody = new CANNON.Body({
+        mass: 150,
+        position: new CANNON.Vec3(0, 2, -4),
+		shape:new CANNON.Box(new CANNON.Vec3(3.5,0.5,1.7)),
+    })
+	var cubeBody2 = new CANNON.Body({
+        mass: 50,
+        position: new CANNON.Vec3(0, 15, -4),
+		shape:new CANNON.Box(new CANNON.Vec3(1,1,1)),
+    })
+	var tank = new CANNON.RaycastVehicle({
+	chassisBody: cubeBody,
+	})
+
+options.chassisConnectionPointLocal.set(2.5, -0.5, 1);
+            tank.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(2.5, -0.5, -1);
+            tank.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(-1.5, -0.5, 1);
+            tank.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(-1.5, -0.5, -1);
+            tank.addWheel(options);
+
+tank.addToWorld(worldf)
+	var wheelBodies = [];
+            for(var i=0; i<tank.wheelInfos.length; i++){
+                var wheel = tank.wheelInfos[i];
+                var cylinderShape = new CANNON.Cylinder(wheel.radius, wheel.radius, wheel.radius / 2, 20);
+                var wheelBody = new CANNON.Body({
+                    mass: 0
+                });
+                wheelBody.type = CANNON.Body.KINEMATIC;
+                wheelBody.collisionFilterGroup = 0; // turn off collisions
+                var q = new CANNON.Quaternion();
+                q.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), Math.PI / 2);
+                wheelBody.addShape(cylinderShape, new CANNON.Vec3(), q);
+                wheelBodies.push(wheelBody);
+                worldf.addBody(wheelBody);
+            }
+			//tank.chassisBody.quaternion.x-=90*Math.PI/180
+var collisionmodel = new THREE.CannonDebugRenderer(scena, worldf)
+document.onmousedown = function(event){
+//controls.domElement.requestPointerLock();
+}
+// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add( listener );
+
+// create a global audio source
+const sound = new THREE.PositionalAudio( listener );//const sound = new THREE.Audio( listener );
+const shot = new THREE.PositionalAudio( listener );
+const engine = new THREE.PositionalAudio( listener );
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'https://proginvert.github.io/3d_resources/aud/shot.wav', function( buffer ) {
+	shot.setBuffer( buffer );
+	shot.setLoop( false );
+	shot.setVolume( 1 );
+	shot.setRefDistance( 1 );//
+	//sound.play();
+});
+audioLoader.load( 'https://proginvert.github.io/3d_resources/aud/engine.wav', function( buffer ) {
+	engine.setBuffer( buffer );
+	engine.setLoop( true );
+	engine.setVolume( 5 );
+	engine.setRefDistance( 1 );//
+	//sound.play();
+});
+audioLoader.load( 'https://proginvert.github.io/3d_resources/aud/Untitled.ogg', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setLoop( true );
+	sound.setVolume( 1 );
+	sound.setRefDistance( 1 );//
+	//sound.play();
+});
+nusha.add(sound)//
+
+var snaryadi = []
+var snaryadi2 = []
+var ballShape = new CANNON.Sphere(0.2);
+var ballGeometry = new THREE.SphereGeometry(ballShape.radius, 32, 32);
+var shootDirection = new THREE.Vector3();
+var shootVelo = 150;
+//var projector = new THREE.Raycaster();
+var sphereShape = new CANNON.Sphere(1.3);
+
+			
+var goforward=false
+var goback=false
+var goleft=false
+var gogight=false
+var connecttank=false
+var rendercollision=true
+document.onkeydown = function(event){
+if(event.code === 'KeyW'){
+goforward=true
+}
+if(event.code === 'KeyS'){
+goback=true
+}
+if(event.code === 'KeyA'){
+goleft=true
+}
+if(event.code === 'KeyD'){
+gogight=true
+}
+if(event.code === 'KeyF'){
+worldf.gravity.set(0, -9.8, -15) 
+}
+if(event.code === 'KeyG'){
+worldf.gravity.set(0, -9.8, 0) 
+sound.play();
+engine.play();
+}
+if(event.code === 'KeyH'){
+
+}
+if(event.code === 'KeyJ'){
+rendercollision=false
+
+}
+if(event.code === 'KeyR'){
+tower8bit.scene.rotateZ(0.01)
+//tower8bit.scene.rotation.z+=0.01
+}
+if(event.code === 'KeyT'){
+
+tower8bit.scene.rotateZ(-0.01)
+}
+if(event.code === 'KeyY'){
+
+stvol.scene.rotateY(0.01)
+}
+if(event.code === 'KeyU'){
+//enginesound.play()
+stvol.scene.rotateY(-0.01)
+}
+if(event.code === 'KeyZ'){
+shot.play();
+const objectsWorldPosition = new THREE.Vector3()
+		stvol.scene.getWorldPosition(objectsWorldPosition)
+var x = objectsWorldPosition.x;
+                    var y = objectsWorldPosition.y//+10
+                    var z = objectsWorldPosition.z;
+                    var ballBody = new CANNON.Body({ mass: 1 });
+                    ballBody.addShape(ballShape);
+					ballBody.lifetime=200
+                    var ballMesh = new THREE.Mesh( ballGeometry, new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
+                    worldf.add(ballBody);
+                    scena.add(ballMesh);
+                    ballMesh.castShadow = true;
+                    ballMesh.receiveShadow = true;
+                    snaryadi.push(ballBody);
+                    snaryadi2.push(ballMesh);
+                    var vector = shootDirection;
+					shootDirection.set(0,0,1);
+					//projector.unprojectVector(vector, camera);
+					var ray = new THREE.Ray(tank.chassisBody.position, vector.sub(tank.chassisBody.position).normalize() );
+					shootDirection.copy(stvol.scene.getWorldDirection());
+					//tank.chassisBody.applyLocalImpulse ( {x:shootDirection.x,y:shootDirection.y,z:shootDirection.z},{x:0,y:0.5,z:0})
+					 tank.chassisBody.angularVelocity.set(  tank.chassisBody.velocity.x-shootDirection.x * (0),
+                                            tank.chassisBody.velocity.y-shootDirection.y * (0),
+                                            tank.chassisBody.velocity.z-shootDirection.z * (shootVelo/100));
+                    ballBody.velocity.set(  shootDirection.x * shootVelo,
+                                            shootDirection.y * shootVelo,
+                                            shootDirection.z * shootVelo);
+
+                    // Move the ball outside the player sphere
+                    x += shootDirection.x * (sphereShape.radius*1.02 + ballShape.radius);
+                    y += shootDirection.y * (sphereShape.radius*1.02 + ballShape.radius);
+                    z += shootDirection.z * (sphereShape.radius*1.02 + ballShape.radius);
+                    ballBody.position.set(x,y,z);
+                    ballMesh.position.set(x,y,z);
+}
+}
+document.onkeyup = function(event){
+if(event.code === 'KeyW'){
+goforward=false
+}
+if(event.code === 'KeyS'){
+goback=false
+}
+if(event.code === 'KeyA'){
+goleft=false
+}
+if(event.code === 'KeyD'){
+gogight=false
+}
+}
+const mock = new THREE.Object3D();
+const cameraDirection = new THREE.Vector3();
+setInterval(function(){
+
+//ctx.clearRect(0,0,width2,height2)
+//ctx.fillStyle='white'
+//ctx.fillRect(130,30,35,35)
+//nusha.position.set(spheref.position.x,spheref.position.y,spheref.position.z)
+var oldX=tank.chassisBody.position.x
+var oldY=tank.chassisBody.position.y
+var oldZ=tank.chassisBody.position.z
+for (var i = 0; i < snaryadi.length; i++) {
+snaryadi[i].lifetime--
+if(snaryadi[i].lifetime<0)
+worldf.remove(snaryadi[i])
+}
+for (var i = 0; i < snaryadi2.length; i++) {
+
+if(snaryadi2[i]){
+snaryadi2[i].position.copy(snaryadi[i].position);
+snaryadi2[i].quaternion.copy(snaryadi[i].quaternion);
+}else{
+scena.remove(snaryadi2[i]);
+ snaryadi2[i] = undefined;
+	delete snaryadi2[i]
+}
+}
+for (var i = 0; i < tank.wheelInfos.length; i++) {
+                    tank.updateWheelTransform(i);
+                    var t = tank.wheelInfos[i].worldTransform;
+                    var wheelBody = wheelBodies[i];
+                    wheelBody.position.copy(t.position);
+                    wheelBody.quaternion.copy(t.quaternion);
+                }
+				/*
+if(tower8bit.scene.rotation.z<camera.rotation.y)
+tower8bit.scene.rotateZ(0.01)
+else
+tower8bit.scene.rotateZ(-0.01)
+*/
+
+  // NOTE Place mock at the same location as the object
+  tower8bit.scene.getWorldPosition(mock.position);
+
+  // NOTE Save camera direction to a vector, then set .y component to 0.0 - so now the vector is just on the X/Z plane
+  camera.getWorldDirection(cameraDirection);
+  cameraDirection.y = 0.0;
+
+  // NOTE Add position of the mock (ie. world position of the object) to the direction vector
+  cameraDirection.add(mock.position);
+
+  // NOTE Make mock look at the resulting position, ie. mock will be pointing in the same direction as the camera is, but at the y-level of the object and only on X/Z plane
+  mock.lookAt(cameraDirection);
+  
+  // NOTE Copy the final quaternion to the original object
+  tower8bit.scene.quaternion.copy(mock.quaternion);
+
+if(goforward===true&&goback===false&&goleft===false&&gogight===false){
+tank.applyEngineForce(100,0)
+tank.applyEngineForce(100,1)
+tank.applyEngineForce(100,2)
+tank.applyEngineForce(100,3)
+}
+else if(goforward===false&&goback===true&&goleft===false&&gogight===false){
+tank.applyEngineForce(-100,0)
+tank.applyEngineForce(-100,1)
+tank.applyEngineForce(-100,2)
+tank.applyEngineForce(-100,3)
+}
+else if(goforward===false&&goback===false&&goleft===true&&gogight===false){
+tank.applyEngineForce(1000,0)
+tank.applyEngineForce(-1000,1)
+tank.applyEngineForce(1000,2)
+tank.applyEngineForce(-1000,3)
+}
+else if(goforward===false&&goback===false&&goleft===false&&gogight===true){
+tank.applyEngineForce(-1000,0)
+tank.applyEngineForce(1000,1)
+tank.applyEngineForce(-1000,2)
+tank.applyEngineForce(1000,3)
+}else{
+tank.applyEngineForce(0,0)
+tank.applyEngineForce(0,1)
+tank.applyEngineForce(0,2)
+tank.applyEngineForce(0,3)
+}
+//goleft
+//gogight
+
+controls.target.set(tank.chassisBody.position.x, tank.chassisBody.position.y, tank.chassisBody.position.z);
+controls.update();//?
+worldf.step(1/60);
+//if(rendercollision===true)
+collisionmodel.update()
+var diffX=tank.chassisBody.position.x-oldX
+var diffY=tank.chassisBody.position.y-oldY
+var diffZ=tank.chassisBody.position.z-oldZ
+camera.position.x+=diffX
+camera.position.y+=diffY
+camera.position.z+=diffZ
+if(connecttank===true){
+tank8bit.scene.position.x=tank.chassisBody.position.x
+tank8bit.scene.position.y=tank.chassisBody.position.y
+tank8bit.scene.position.z=tank.chassisBody.position.z
+
+tank8bit.scene.quaternion.x=tank.chassisBody.quaternion.x//-25*Math.PI/180
+tank8bit.scene.quaternion.y=tank.chassisBody.quaternion.y//+90*Math.PI/180
+tank8bit.scene.quaternion.z=tank.chassisBody.quaternion.z
+tank8bit.scene.quaternion.w=tank.chassisBody.quaternion.w
+//tank8bit.scene.rotation.z+=90*Math.PI/180
+//tank8bit.scene.rotation.y+=90*Math.PI/180
+}
+rendrer.render(scena,camera)
+},1000/60)
+
+</script>

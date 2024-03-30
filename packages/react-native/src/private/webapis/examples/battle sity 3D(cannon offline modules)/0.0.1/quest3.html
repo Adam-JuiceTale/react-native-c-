@@ -1,0 +1,127 @@
+        <style>
+            body {
+                color: #61443e;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #bfd1e5;
+                margin: 0px;
+                overflow: hidden;
+            }
+			#speedometer {
+				color: #ffffff;
+				background-color: #990000;
+				position: absolute;
+				bottom: 0px;
+				padding: 5px;
+			}
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #a06851;
+            }
+
+        </style>
+<canvas id="ctx"></canvas>
+<canvas id="ctx2" style="position:absolute; top:0px;left:0px"></canvas>
+<script src="three.min.js"></script>
+<script src="PointerLockControls2.js"></script>
+<script>
+  ctx.width  = window.innerWidth 
+  ctx.height = window.innerHeight
+  var ctx2 = document.getElementById('ctx2').getContext('2d')
+ctx2.canvas.width=window.innerWidth/4
+ctx2.canvas.height=window.innerHeight/4
+var color_green = new THREE.MeshLambertMaterial({color:0x7fe000})
+var color_blue = new THREE.MeshLambertMaterial({color:0x0588e6})
+var color_purple = new THREE.MeshLambertMaterial({color:0x9305e6})
+
+var geometryball=new THREE.SphereGeometry(320,32,32)
+var ploskost=new THREE.PlaneGeometry(5,50,32,32)
+var geometryblock=new THREE.BoxGeometry(1,1,1)
+
+var mesh1 = new THREE.Mesh(geometryblock,color_blue)
+var mesh2 = new THREE.Mesh(geometryblock,color_blue)
+mesh2.scale.set(0.2, 0.2, 0.2);
+var mesh3 = new THREE.Mesh(ploskost,color_green)
+mesh3.rotation.x=-90*Math.PI/180
+var mesh4 = new THREE.Mesh(geometryblock,color_blue)
+var mesh5 = new THREE.Mesh(geometryblock,color_blue)
+mesh5.scale.set(0.2, 0.2, 2);
+var rendrer = new THREE.WebGLRenderer({canvas:ctx})
+
+var camera = new THREE.PerspectiveCamera(45,window.innerWidth / window.innerHeight,0.1,5000)
+camera.position.set(0,4,30)
+
+var scena = new THREE.Scene()
+
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 2);
+scena.add(light);
+var ambientl = new THREE.AmbientLight(0xffffff,1)
+scena.add(ambientl)
+scena.add(mesh1)
+scena.add(mesh2)
+scena.add(mesh3)
+mesh4.position.set(camera.position.x,camera.position.y,camera.position.z)
+
+scena.add(mesh4)
+mesh2.add(mesh4)
+mesh4.visible=false
+scena.add(mesh5)
+mesh1.add(mesh5)
+document.onmousemove = function(event){
+
+
+
+		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+		
+
+		mesh2.rotation.y -= movementX * 0.002;
+		mesh2.rotation.x -= movementY * 0.002;
+
+		//euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+
+		//camera.quaternion.setFromEuler( euler );
+
+		//scope.dispatchEvent( changeEvent );
+
+	}
+		function animate() {
+requestAnimationFrame( animate );
+if(mesh1.rotation.y<mesh2.rotation.y){
+mesh1.rotation.y+=0.01
+}else{
+mesh1.rotation.y-=0.01
+}
+mesh1.position.z-=0.1
+mesh2.position.set(mesh1.position.x,mesh1.position.y,mesh1.position.z)
+if(mesh5.rotation.x<mesh2.rotation.x){
+mesh5.rotation.x+=0.01
+}else{
+mesh5.rotation.x-=0.01
+}
+///mesh5.rotation.y=mesh1.rotation.y
+//mesh5.position.set(mesh1.position.x,mesh1.position.y,mesh1.position.z)
+cameradotpos = new THREE.Vector3()
+mesh4.getWorldPosition(cameradotpos)
+camera.position.set(cameradotpos.x,cameradotpos.y,cameradotpos.z)
+camera.lookAt(mesh1.position.x,mesh1.position.y,mesh1.position.z)
+ctx2.clearRect(0,0,window.innerWidth/4,window.innerHeight/4)
+ctx2.fillStyle='white'
+ctx2.fillRect(130+mesh5.rotation.x*10,30,35,35)
+ctx2.fillRect(130+mesh1.rotation.y*10,80,35,35)
+ctx2.fillRect(130+mesh1.rotation.z*10,130,35,35)			
+rendrer.render(scena,camera)
+
+}
+animate()
+</script>

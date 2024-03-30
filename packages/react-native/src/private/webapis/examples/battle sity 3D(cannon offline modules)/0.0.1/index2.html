@@ -1,0 +1,241 @@
+<style>
+body {
+margin:0;
+}
+</style>
+<canvas id="ctx3d"></canvas>
+
+<!--<canvas id="ctx" style="position:absolute; top:0px;left:0px"></canvas>-->
+<button id="but1"style="position:absolute;top:500px;left:0px">sd</button>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="cannon.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+var width2 = window.innerWidth 
+var height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//var ctx = document.getElementById('ctx').getContext('2d')
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+window.addEventListener('resize',function(){//изменение размера окна
+width2 = window.innerWidth 
+height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+})
+
+var color_green = new THREE.MeshLambertMaterial({color:0x7fe000})//материал
+var color_blue = new THREE.MeshBasicMaterial({color:0x0588e6})//материал
+var color_purple = new THREE.MeshBasicMaterial({color:0x9305e6})//материал
+var gray = new THREE.MeshLambertMaterial({color: 'red'})
+var geometryball=new THREE.SphereGeometry(11,32,32)//геометрия
+var geometryblock=null//
+var ploskost=new THREE.PlaneGeometry(550,550,32,32)//геометрия
+
+var nusha = new THREE.Mesh(geometryball,gray)//меш
+var krosh = new THREE.Mesh(geometryball,color_blue)//меш
+var poll = new THREE.Mesh(ploskost,color_green)//меш
+poll.rotation.x=-Math.PI/2
+nusha.position.y=15
+nusha.position.x=115
+
+
+
+var rendrer = new THREE.WebGLRenderer({canvas:ctx3d})
+//rendrer.setClearColor(0x00ff00)
+var camera = new THREE.PerspectiveCamera(45,width2/height2,0.1,5000)
+camera.position.set(0,0,10)
+
+//camera.rotation.set(0,0.2,0)
+var scena = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffe3b0, 1);
+    light.position.set(0, 10, 0);
+    scena.add(light);
+    scena.add(light.target);
+
+scena.add(nusha)
+scena.add(poll)
+
+var controls = new THREE.OrbitControls(camera, ctx3d);
+
+var worldf = new CANNON.World() 
+    worldf.gravity.set(0, -9.8, 0) 
+var groundf = new CANNON.Body({
+type: CANNON.Body.STATIC,
+shape: new CANNON.Plane(),
+})
+groundf.quaternion.setFromEuler(-Math.PI/2,0,0)
+worldf.addBody(groundf)
+var radiussperef = 1
+/*
+var spheref = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref.position.y=35
+spheref.position.x=1
+worldf.addBody(spheref)
+var spheref2 = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref2.position.y=10
+spheref2.position.x=1
+worldf.addBody(spheref2)
+var spheref3 = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref3.position.y=25
+spheref3.position.x=1
+worldf.addBody(spheref3)
+var spheref4 = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref4.position.y=15
+spheref4.position.x=1
+worldf.addBody(spheref4)
+*/
+var cubeBody = new CANNON.Body({
+        mass: 10,
+        position: new CANNON.Vec3(0, 6, 0),
+		shape:new CANNON.Box(new CANNON.Vec3(4,0.5,2)),
+    })
+	var tank = new CANNON.RigidVehicle({
+	chassisBody: cubeBody,
+	})
+
+var mass = 1
+/*
+var asicswith = 5
+var wilshare = new CANNON.Sphere(1)
+var welmat = new CANNON.Material('wheel')
+var downse = new CANNON.Vec3(0,-1,0)
+*/
+var sfer1 = new CANNON.Body({
+mass,
+material: new CANNON.Material('wheel')
+})
+sfer1.addShape(new CANNON.Sphere(1))
+sfer1.angularDamping = 0.4
+tank.addWheel({
+body: sfer1,
+position: new CANNON.Vec3(-2,0,5/2),
+axis:new CANNON.Vec3(0,0,1),
+direction:new CANNON.Vec3(0,-1,0),
+})
+var sfer2 = new CANNON.Body({
+mass,
+material: new CANNON.Material('wheel')
+})
+sfer2.addShape(new CANNON.Sphere(1))
+sfer2.angularDamping = 0.4
+tank.addWheel({
+body: sfer2,
+position: new CANNON.Vec3(-2,0,-5/2),
+axis:new CANNON.Vec3(0,0,1),
+direction:new CANNON.Vec3(0,-1,0),
+})
+var sfer3 = new CANNON.Body({
+mass,
+material: new CANNON.Material('wheel')
+})
+sfer3.addShape(new CANNON.Sphere(1))
+sfer3.angularDamping = 0.4
+tank.addWheel({
+body: sfer3,
+position: new CANNON.Vec3(2,0,5/2),
+axis:new CANNON.Vec3(0,0,1),
+direction:new CANNON.Vec3(0,-1,0),
+})
+var sfer4 = new CANNON.Body({
+mass,
+material: new CANNON.Material('wheel')
+})
+sfer4.addShape(new CANNON.Sphere(1))
+sfer4.angularDamping = 0.4
+tank.addWheel({
+body: sfer4,
+position: new CANNON.Vec3(2,0,-5/2),
+axis:new CANNON.Vec3(0,0,1),
+direction:new CANNON.Vec3(0,-1,0),
+})
+tank.addToWorld(worldf)
+	//worldf.addBody(cubeBody)
+	
+var collisionmodel = new THREE.CannonDebugRenderer(scena, worldf)
+document.onmousedown = function(event){
+//controls.domElement.requestPointerLock();
+}
+var goforward=false
+var goback=false
+var goleft=false
+var gogight=false
+document.onkeydown = function(event){
+if(event.code === 'KeyW'){
+goforward=true
+}
+if(event.code === 'KeyS'){
+goback=true
+}
+if(event.code === 'KeyA'){
+goleft=true
+}
+if(event.code === 'KeyD'){
+gogight=true
+}
+}
+document.onkeyup = function(event){
+if(event.code === 'KeyW'){
+goforward=false
+}
+if(event.code === 'KeyS'){
+goback=false
+}
+if(event.code === 'KeyA'){
+goleft=false
+}
+if(event.code === 'KeyD'){
+gogight=false
+}
+}
+setInterval(function(){
+
+//ctx.clearRect(0,0,width2,height2)
+//ctx.fillStyle='white'
+//ctx.fillRect(130,30,35,35)
+//nusha.position.set(spheref.position.x,spheref.position.y,spheref.position.z)
+if(goforward===true){
+tank.setWheelForce(100,0)
+tank.setWheelForce(100,1)
+}
+else if(goback===true){
+tank.setWheelForce(-100,0)
+tank.setWheelForce(-100,1)
+}else{
+tank.setWheelForce(0,0)
+tank.setWheelForce(0,1)
+}
+if(goleft===true){
+tank.setSteeringValue(0.5,2)
+tank.setSteeringValue(0.5,3)
+}
+else if(gogight===true){
+tank.setSteeringValue(-0.5,2)
+tank.setSteeringValue(-0.5,3)
+}else{
+//tank.setSteeringValue(Math.PI / 8;,2)
+//tank.setSteeringValue(Math.PI / 8;,3)
+}
+controls.update();
+worldf.step(1/60);
+collisionmodel.update()
+rendrer.render(scena,camera)
+},1000/60)
+
+</script>

@@ -1,0 +1,103 @@
+<style>
+body {
+margin:0;
+}
+</style>
+<canvas id="ctx3d"></canvas>
+
+<!--<canvas id="ctx" style="position:absolute; top:0px;left:0px"></canvas>-->
+<button id="but1"style="position:absolute;top:500px;left:0px">sd</button>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="cannon.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+var width2 = window.innerWidth 
+var height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//var ctx = document.getElementById('ctx').getContext('2d')
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+window.addEventListener('resize',function(){//изменение размера окна
+width2 = window.innerWidth 
+height2 = window.innerHeight
+ctx3d.width = width2
+ctx3d.height = height2
+//ctx.canvas.width=width2
+//ctx.canvas.height=height2
+})
+
+var color_green = new THREE.MeshLambertMaterial({color:0x7fe000})//материал
+var color_blue = new THREE.MeshBasicMaterial({color:0x0588e6})//материал
+var color_purple = new THREE.MeshBasicMaterial({color:0x9305e6})//материал
+var gray = new THREE.MeshLambertMaterial({color: 'red'})
+var geometryball=new THREE.SphereGeometry(11,32,32)//геометрия
+var geometryblock=null//
+var ploskost=new THREE.PlaneGeometry(550,550,32,32)//геометрия
+
+var nusha = new THREE.Mesh(geometryball,gray)//меш
+var krosh = new THREE.Mesh(geometryball,color_blue)//меш
+var poll = new THREE.Mesh(ploskost,color_green)//меш
+poll.rotation.x=-Math.PI/2
+nusha.position.y=15
+nusha.position.x=115
+
+
+
+var rendrer = new THREE.WebGLRenderer({canvas:ctx3d})
+//rendrer.setClearColor(0x00ff00)
+var camera = new THREE.PerspectiveCamera(45,width2/height2,0.1,5000)
+camera.position.set(0,0,1000)
+
+//camera.rotation.set(0,0.2,0)
+var scena = new THREE.Scene()
+const light = new THREE.DirectionalLight(0xffe3b0, 1);
+    light.position.set(0, 10, 0);
+    scena.add(light);
+    scena.add(light.target);
+
+scena.add(nusha)
+scena.add(poll)
+
+var controls = new THREE.OrbitControls(camera, ctx3d);
+
+var worldf = new CANNON.World() 
+    worldf.gravity.set(0, -9.8, 0) 
+var groundf = new CANNON.Body({
+type: CANNON.Body.STATIC,
+shape: new CANNON.Plane(),
+})
+groundf.quaternion.setFromEuler(-Math.PI/2,0,0)
+worldf.addBody(groundf)
+var radiussperef = 1
+var spheref = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref.position.y=115
+worldf.addBody(spheref)
+var spheref2 = new CANNON.Body({
+mass:15,
+shape: new CANNON.Sphere(radiussperef),
+})
+spheref2.position.y=10
+spheref2.position.x=1
+worldf.addBody(spheref2)
+var collisionmodel = new THREE.CannonDebugRenderer(scena, worldf)
+document.onmousedown = function(event){
+//controls.domElement.requestPointerLock();
+}
+setInterval(function(){
+
+//ctx.clearRect(0,0,width2,height2)
+//ctx.fillStyle='white'
+//ctx.fillRect(130,30,35,35)
+//nusha.position.set(spheref.position.x,spheref.position.y,spheref.position.z)
+controls.update();
+worldf.step(1/60);
+collisionmodel.update()
+rendrer.render(scena,camera)
+},1000/60)
+
+</script>
