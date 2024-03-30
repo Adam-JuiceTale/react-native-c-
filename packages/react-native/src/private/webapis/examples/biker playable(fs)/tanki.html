@@ -1,0 +1,347 @@
+<style>
+    body {
+        margin: 0;
+    }
+</style>
+<canvas id="ctx3d"></canvas>
+<canvas id="ctx" style="position:absolute; top:0px;left:0px"></canvas>
+<button id="but1" style="position:absolute;top:500px;left:0px">sd</button>
+<script src="three.min.js"></script>
+<!--<script src="PointerLockControls.js"></script>-->
+<script src="GLTFLoader.js"></script>
+<script src="cannon.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+ var width2 = window.innerWidth, height2 = window.innerHeight;
+ctx3d.width = width2;
+ctx3d.height = height2;
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.canvas.width = width2;
+ctx.canvas.height = height2;
+window.addEventListener("resize", function () {
+  width2 = window.innerWidth;
+  height2 = window.innerHeight;
+  ctx3d.width = width2;
+  ctx3d.height = height2;
+  ctx.canvas.width = width2;
+  ctx.canvas.height = height2;
+});
+var color_green = new THREE.MeshLambertMaterial({color: 3487791}), color_blue = new THREE.MeshBasicMaterial({color: 362726}), color_purple = new THREE.MeshBasicMaterial({color: 9635302}), gray = new THREE.MeshLambertMaterial({color: "red"}), geometryball = new THREE.SphereGeometry(11, 32, 32), geometryball2 = new THREE.SphereGeometry(0.1, 10, 10), geometryblock = null, ploskost = new THREE.PlaneGeometry(550, 550, 32, 32), nusha = new THREE.Mesh(geometryball, gray), krosh = new THREE.Mesh(geometryball, color_blue), poll = new THREE.Mesh(ploskost, color_green);
+poll.rotation.x = -Math.PI / 2;
+nusha.position.y = 5015;
+nusha.position.x = 115;
+var rendrer = new THREE.WebGLRenderer({canvas: ctx3d, antialias: true}), camera = new THREE.PerspectiveCamera(45, width2 / height2, 0.1, 5e3);
+camera.position.set(0, 14, 10);
+var scena = new THREE.Scene, light = new THREE.DirectionalLight(16769968, 2);
+light.position.set(0, 10, 0);
+scena.add(light);
+scena.add(light.target);
+var ambientl = new THREE.AmbientLight(16777215, 0.5);
+scena.add(ambientl);
+scena.add(nusha);
+scena.add(poll);
+var loading_resources = [], sharnir1 = new THREE.Mesh(geometryball2, gray);
+sharnir1.rotation.y = -25 * Math.PI / 180;
+scena.add(sharnir1);
+sharnir1.visible = false;
+var sharnir2 = new THREE.Mesh(geometryball2, gray);
+scena.add(sharnir2);
+sharnir2.visible = false;
+sharnir1.add(sharnir2);
+var cameradot = new THREE.Mesh(geometryball2, gray);
+cameradot.position.z = 15;
+scena.add(cameradot);
+cameradot.visible = false;
+sharnir2.add(cameradot);
+var doubletail1 = new THREE.Mesh(geometryball2, gray);
+scena.add(doubletail1);
+doubletail1.visible = false;
+var doubletail2 = new THREE.Mesh(geometryball2, gray);
+scena.add(doubletail2);
+doubletail2.visible = false;
+var centertankdot = new THREE.Mesh(geometryball2, gray);
+scena.add(centertankdot);
+centertankdot.visible = false;
+var taildot = new THREE.Mesh(geometryball2, gray);
+taildot.position.x = 5;
+scena.add(taildot);
+taildot.visible = false;
+centertankdot.add(taildot);
+var gunshotdot = new THREE.Mesh(geometryball2, gray);
+gunshotdot.position.x = -15;
+gunshotdot.rotation.y = -90 * Math.PI / 180;
+scena.add(gunshotdot);
+gunshotdot.visible = false;
+var paybackshot = new THREE.Mesh(geometryball2, gray);
+scena.add(paybackshot);
+paybackshot.visible = false;
+var glftload = new THREE.GLTFLoader, tank8bit = false;
+glftload.load("https://proginvert.github.io/3d_resources/battle_city_tank/mamont_chassis.gltf", function (_0xaf0fx20) {
+  tank8bit = _0xaf0fx20;
+  _0xaf0fx20.scene.scale.set(0.2, 0.2, 0.2);
+  scena.add(_0xaf0fx20.scene);
+  loading_resources.push(true);
+});
+var tower8bit = false;
+glftload.load("https://proginvert.github.io/3d_resources/battle_city_tank/mamont_tower.gltf", function (_0xaf0fx20) {
+  tower8bit = _0xaf0fx20;
+  _0xaf0fx20.scene.position.z = 3;
+  _0xaf0fx20.scene.position.x = 2;
+  _0xaf0fx20.scene.rotation.x = 90 * Math.PI / 180;
+  scena.add(_0xaf0fx20.scene);
+  loading_resources.push(true);
+});
+var dulo = new THREE.BoxGeometry(2, 2, 30), stvol = null;
+glftload.load("https://proginvert.github.io/3d_resources/battle_city_tank/mamont_gun.gltf", function (_0xaf0fx20) {
+  stvol = _0xaf0fx20;
+  stvol.scene.position.x -= 9;
+  stvol.scene.position.y += 2;
+  scena.add(_0xaf0fx20.scene);
+  loading_resources.push(true);
+});
+var tree = 0;
+glftload.load("https://proginvert.github.io/3d_resources/battle_sity_map/block/three.gltf", function (_0xaf0fx20) {
+  tree = _0xaf0fx20.scene;
+  _0xaf0fx20.scene.scale.set(0.2, 0.2, 0.2);
+  _0xaf0fx20.scene.position.y += 1.5;
+  scena.add(_0xaf0fx20.scene);
+  loading_resources.push(true);
+});
+var brick = 0;
+glftload.load("https://proginvert.github.io/3d_resources/battle_sity_map/block/brick_wall.gltf", function (_0xaf0fx20) {
+  brick = _0xaf0fx20.scene;
+  _0xaf0fx20.scene.scale.set(0.2, 0.2, 0.2);
+  _0xaf0fx20.scene.position.y += 1.5;
+  scena.add(_0xaf0fx20.scene);
+  loading_resources.push(true);
+});
+var blocksize = 3.2, fizblocksize = 1.6, brickrendlist = [], brickfizlist = [];
+classtree = function (_0xaf0fx20, _0xaf0fx2a, _0xaf0fx2b, _0xaf0fx2c) {
+  for (var _0xaf0fx2d = _0xaf0fx20, _0xaf0fx2e = 0; _0xaf0fx2e < _0xaf0fx2c; _0xaf0fx2e++) {
+    for (var _0xaf0fx2f = 0; _0xaf0fx2f < _0xaf0fx2b; _0xaf0fx2f++) {
+      tree2 = tree.clone(), tree2.position.x = _0xaf0fx20, tree2.position.z = _0xaf0fx2a, scena.add(tree2), _0xaf0fx20 -= blocksize;
+    }
+    ;
+    _0xaf0fx20 = _0xaf0fx2d;
+    _0xaf0fx2a -= blocksize;
+  }
+};
+classbrick = function (_0xaf0fx20, _0xaf0fx2a, _0xaf0fx2b, _0xaf0fx2c) {
+  for (var _0xaf0fx2d = _0xaf0fx20, _0xaf0fx2e = 0; _0xaf0fx2e < _0xaf0fx2c; _0xaf0fx2e++) {
+    for (var _0xaf0fx2f = 0; _0xaf0fx2f < _0xaf0fx2b; _0xaf0fx2f++) {
+      var _0xaf0fx30 = Math.random();
+      brick2 = brick.clone();
+      brick2.position.x = _0xaf0fx20;
+      brick2.position.z = _0xaf0fx2a;
+      brick2.numba2 = _0xaf0fx30;
+      brickrendlist.push(brick2);
+      scena.add(brick2);
+      var _0xaf0fx31 = new CANNON.Body({mass: 0, position: new CANNON.Vec3(_0xaf0fx20, fizblocksize, _0xaf0fx2a), shape: new CANNON.Box(new CANNON.Vec3(fizblocksize, fizblocksize, fizblocksize))});
+      _0xaf0fx31.numba2 = _0xaf0fx30;
+      brickfizlist.push(_0xaf0fx31);
+      worldf.addBody(_0xaf0fx31);
+      _0xaf0fx20 -= blocksize;
+    }
+    ;
+    _0xaf0fx20 = _0xaf0fx2d;
+    _0xaf0fx2a -= blocksize;
+  }
+};
+var loader = new THREE.CubeTextureLoader, texture = loader.load("https://proginvert.github.io/3d_resources/battle_sity_map/pos-x.jpg https://proginvert.github.io/3d_resources/battle_sity_map/neg-x.jpg https://proginvert.github.io/3d_resources/battle_sity_map/pos-y.jpg https://proginvert.github.io/3d_resources/battle_sity_map/neg-y.jpg https://proginvert.github.io/3d_resources/battle_sity_map/pos-z.jpg https://proginvert.github.io/3d_resources/battle_sity_map/neg-z.jpg".split(" "));
+scena.background = texture;
+var worldf = new CANNON.World;
+worldf.gravity.set(0, -9.8, 0);
+var groundf = new CANNON.Body({type: CANNON.Body.STATIC, shape: new CANNON.Plane, aaa: 83});
+groundf.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+worldf.addBody(groundf);
+var radiussperef = 1, options = {radius: 0.5, directionLocal: new CANNON.Vec3(0, 0, -1), suspensionStiffness: 10, suspensionRestLength: 0.3, frictionSlip: 1, dampingRelaxation: 2.3, dampingCompression: 1.4, maxSuspensionForce: 1e5, rollInfluence: 0.01, axleLocal: new CANNON.Vec3(0, 1, 0), chassisConnectionPointLocal: new CANNON.Vec3(1, 1, 0), maxSuspensionTravel: 0.3, customSlidingRotationalSpeed: -3, useCustomSlidingRotationalSpeed: true}, cubeBody = new CANNON.Body({mass: 150, position: new CANNON.Vec3(0, 9, -150), shape: new CANNON.Box(new CANNON.Vec3(3.5, 1.7, 0.5))}), cubeBody2 = new CANNON.Body({mass: 1, position: new CANNON.Vec3(5, 5, 5), shape: new CANNON.Box(new CANNON.Vec3(1, 5, 5))});
+worldf.addBody(cubeBody2);
+var tank = new CANNON.RaycastVehicle({chassisBody: cubeBody});
+cubeBody2.addEventListener("collide", function (_0xaf0fx20) {
+  attach_tank_parts && console.log(_0xaf0fx20.body.mass);
+});
+options.chassisConnectionPointLocal.set(2.5, 1, -0.5);
+tank.addWheel(options);
+options.chassisConnectionPointLocal.set(2.5, -1, -0.5);
+tank.addWheel(options);
+options.chassisConnectionPointLocal.set(-2.5, 1, -0.5);
+tank.addWheel(options);
+options.chassisConnectionPointLocal.set(-2.5, -1, -0.5);
+tank.addWheel(options);
+tank.addToWorld(worldf);
+for (var wheelBodies = [], i = 0; i < tank.wheelInfos.length; i++) {
+  var wheel = tank.wheelInfos[i], cylinderShape = new CANNON.Cylinder(wheel.radius, wheel.radius, wheel.radius / 2, 20), wheelBody = new CANNON.Body({mass: 0});
+  wheelBody.type = CANNON.Body.KINEMATIC;
+  wheelBody.collisionFilterGroup = 0;
+  var q = new CANNON.Quaternion;
+  q.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);
+  wheelBody.addShape(cylinderShape, new CANNON.Vec3, q);
+  wheelBodies.push(wheelBody);
+  worldf.addBody(wheelBody);
+}
+;
+tank.chassisBody.quaternion.x -= 90 * Math.PI / 180;
+var collisionmodel = new THREE.CannonDebugRenderer(scena, worldf);
+document.onmousedown = function (_0xaf0fx20) {};
+var isLocked = false;
+but1.onclick = function (_0xaf0fx20) {
+  ctx3d.requestPointerLock();
+  isLocked = true;
+  sound.play();
+  engine.play();
+};
+document.onmousemove = function (_0xaf0fx20) {
+  if (false !== isLocked) {
+    var _0xaf0fx2a = _0xaf0fx20.movementY || _0xaf0fx20.mozMovementY || _0xaf0fx20.webkitMovementY || 0;
+    sharnir1.rotation.y -= 0.002 * (_0xaf0fx20.movementX || _0xaf0fx20.mozMovementX || _0xaf0fx20.webkitMovementX || 0);
+    sharnir2.rotation.x -= 0.002 * _0xaf0fx2a;
+  }
+};
+var towerstop = false;
+document.onmousedown = function (_0xaf0fx20) {
+  3 === _0xaf0fx20.which && (towerstop = true);
+  if (1 === _0xaf0fx20.which && true === isLocked) {
+    shot.play();
+    var _0xaf0fx2a = new THREE.Vector3;
+    gunshotdot.getWorldPosition(_0xaf0fx2a);
+    _0xaf0fx20 = _0xaf0fx2a.x;
+    var _0xaf0fx2b = _0xaf0fx2a.y;
+    _0xaf0fx2a = _0xaf0fx2a.z;
+    var _0xaf0fx2c = new CANNON.Body({mass: 1.01});
+    _0xaf0fx2c.addShape(ballShape);
+    _0xaf0fx2c.lifetime = 200;
+    var _0xaf0fx2d = new THREE.Mesh(ballGeometry, new THREE.MeshLambertMaterial({color: 14540253}));
+    worldf.add(_0xaf0fx2c);
+    scena.add(_0xaf0fx2d);
+    _0xaf0fx2d.castShadow = true;
+    _0xaf0fx2d.receiveShadow = true;
+    var _0xaf0fx2e = Math.random();
+    snaryadi.push(_0xaf0fx2c);
+    snaryadi.numba = _0xaf0fx2e;
+    snaryadi2.push(_0xaf0fx2d);
+    snaryadi2.numba = _0xaf0fx2e;
+    _0xaf0fx2e = shootDirection;
+    shootDirection.set(0, 0, 1);
+    shootDirection2.set(0, 0, 1);
+    new THREE.Ray(tank.chassisBody.position, _0xaf0fx2e.sub(tank.chassisBody.position).normalize());
+    shootDirection.copy(gunshotdot.getWorldDirection());
+    shootDirection2.copy(paybackshot.getWorldDirection());
+    tank.chassisBody.angularVelocity.set(1 * shootDirection2.x, 1 * shootDirection2.y, 1 * shootDirection2.z);
+    _0xaf0fx2c.velocity.set(shootDirection.x * shootVelo, shootDirection.y * shootVelo, shootDirection.z * shootVelo);
+    _0xaf0fx20 += shootDirection.x * (1.02 * sphereShape.radius + ballShape.radius);
+    _0xaf0fx2b += shootDirection.y * (1.02 * sphereShape.radius + ballShape.radius);
+    _0xaf0fx2a += shootDirection.z * (1.02 * sphereShape.radius + ballShape.radius);
+    _0xaf0fx2c.position.set(_0xaf0fx20, _0xaf0fx2b, _0xaf0fx2a);
+    _0xaf0fx2d.position.set(_0xaf0fx20, _0xaf0fx2b, _0xaf0fx2a);
+  }
+};
+document.onmouseup = function (_0xaf0fx20) {
+  3 === _0xaf0fx20.which && (towerstop = false);
+};
+document.addEventListener ? "onwheel" in document ? document.addEventListener("wheel", onWheel) : "onmousewheel" in document ? document.addEventListener("mousewheel", onWheel) : document.addEventListener("MozMousePixelScroll", onWheel) : document.attachEvent("onmousewheel", onWheel);
+function onWheel(_0xaf0fx20) {
+  _0xaf0fx20 = _0xaf0fx20 || window.event;
+  cameradot.position.z += (_0xaf0fx20.deltaY || _0xaf0fx20.detail || _0xaf0fx20.wheelDelta) / 100;
+}
+var listener = new THREE.AudioListener;
+camera.add(listener);
+var sound = new THREE.PositionalAudio(listener), shot = new THREE.PositionalAudio(listener), engine = new THREE.PositionalAudio(listener), audioLoader = new THREE.AudioLoader;
+audioLoader.load("https://proginvert.github.io/3d_resources/aud/shot.wav", function (_0xaf0fx20) {
+  shot.setBuffer(_0xaf0fx20);
+  shot.setLoop(false);
+  shot.setVolume(1);
+  shot.setRefDistance(1);
+  loading_resources.push(true);
+});
+audioLoader.load("https://proginvert.github.io/3d_resources/aud/engine.wav", function (_0xaf0fx20) {
+  engine.setBuffer(_0xaf0fx20);
+  engine.setLoop(true);
+  engine.setVolume(5);
+  engine.setRefDistance(1);
+  loading_resources.push(true);
+});
+audioLoader.load("https://proginvert.github.io/3d_resources/aud/Untitled.ogg", function (_0xaf0fx20) {
+  sound.setBuffer(_0xaf0fx20);
+  sound.setLoop(true);
+  sound.setVolume(1);
+  sound.setRefDistance(1);
+  loading_resources.push(true);
+});
+var snaryadi = [], snaryadi2 = [], ballShape = new CANNON.Sphere(0.2), ballGeometry = new THREE.SphereGeometry(ballShape.radius, 32, 32), shootDirection = new THREE.Vector3, shootDirection2 = new THREE.Vector3, shootVelo = 150, sphereShape = new CANNON.Sphere(1.3), goforward = false, goback = false, goleft = false, gogight = false, rendercollision = true;
+document.onkeydown = function (_0xaf0fx20) {
+  "ArrowUp" === _0xaf0fx20.code && (goforward = true);
+  "ArrowDown" === _0xaf0fx20.code && (goback = true);
+  "ArrowLeft" === _0xaf0fx20.code && (goleft = true);
+  "ArrowRight" === _0xaf0fx20.code && (gogight = true);
+  "KeyF" === _0xaf0fx20.code && worldf.gravity.set(0, -9.8, -15);
+  "KeyG" === _0xaf0fx20.code && (worldf.gravity.set(0, -9.8, 0), sound.play(), engine.play());
+  "KeyJ" === _0xaf0fx20.code && (rendercollision = false);
+  "KeyR" === _0xaf0fx20.code && tower8bit.scene.rotateZ(0.01);
+  "KeyT" === _0xaf0fx20.code && tower8bit.scene.rotateZ(-0.01);
+  "KeyY" === _0xaf0fx20.code && stvol.scene.rotateY(0.01);
+  "KeyU" === _0xaf0fx20.code && stvol.scene.rotateY(-0.01);
+  "Escape" === _0xaf0fx20.code && (isLocked = false);
+};
+document.onkeyup = function (_0xaf0fx20) {
+  "ArrowUp" === _0xaf0fx20.code && (goforward = false);
+  "ArrowDown" === _0xaf0fx20.code && (goback = false);
+  "ArrowLeft" === _0xaf0fx20.code && (goleft = false);
+  "ArrowRight" === _0xaf0fx20.code && (gogight = false);
+};
+var attach_tank_parts = false;
+setInterval(function () {
+  if (false === attach_tank_parts) {
+    for (var _0xaf0fx20 = true, _0xaf0fx2a = 0; 8 > _0xaf0fx2a; _0xaf0fx2a++) {
+      if (console.log(_0xaf0fx2a), true !== loading_resources[_0xaf0fx2a]) {
+        _0xaf0fx20 = false;
+        break;
+      }
+    }
+    ;
+    true === _0xaf0fx20 && (tank8bit.scene.add(engine), doubletail1.position.x = 25, doubletail1.position.y = -2, tank8bit.scene.add(doubletail1), doubletail2.position.x = 25, doubletail2.position.y = 2, tank8bit.scene.add(doubletail2), tank8bit.scene.add(tower8bit.scene), tower8bit.scene.add(stvol.scene), stvol.scene.add(shot), stvol.scene.add(gunshotdot), paybackshot.rotation.y = -90 * Math.PI / 180, gunshotdot.add(paybackshot), classtree(0, -150, 10, 2), classbrick(0, -160, 10, 2), brickrendlist[0].add(sound), attach_tank_parts = true);
+  } else {
+    ctx.clearRect(0, 0, width2, height2);
+    ctx.fillStyle = "white";
+    ctx.fillRect(130, 30, 35, 35);
+    for (_0xaf0fx2a = 0; _0xaf0fx2a < snaryadi.length; _0xaf0fx2a++) {
+      snaryadi[_0xaf0fx2a].lifetime--, 0 > snaryadi[_0xaf0fx2a].lifetime && worldf.remove(snaryadi[_0xaf0fx2a]);
+    }
+    ;
+    for (_0xaf0fx2a = 0; _0xaf0fx2a < snaryadi2.length; _0xaf0fx2a++) {
+      snaryadi2[_0xaf0fx2a] && (snaryadi2[_0xaf0fx2a].position.copy(snaryadi[_0xaf0fx2a].position), snaryadi2[_0xaf0fx2a].quaternion.copy(snaryadi[_0xaf0fx2a].quaternion));
+    }
+    ;
+    for (_0xaf0fx2a = 0; _0xaf0fx2a < tank.wheelInfos.length; _0xaf0fx2a++) {
+      tank.updateWheelTransform(_0xaf0fx2a);
+      _0xaf0fx20 = tank.wheelInfos[_0xaf0fx2a].worldTransform;
+      var _0xaf0fx2b = wheelBodies[_0xaf0fx2a];
+      _0xaf0fx2b.position.copy(_0xaf0fx20.position);
+      _0xaf0fx2b.quaternion.copy(_0xaf0fx20.quaternion);
+    }
+    ;
+    false === towerstop && (doubletail1pos = new THREE.Vector3, doubletail1.getWorldPosition(doubletail1pos), doubletail2pos = new THREE.Vector3, doubletail2.getWorldPosition(doubletail2pos), taildotpos = new THREE.Vector3, taildot.getWorldPosition(taildotpos), taildotpos.distanceTo(doubletail1pos) < taildotpos.distanceTo(doubletail2pos) - 0.05 && (centertankdot.rotation.y += 0.01), taildotpos.distanceTo(doubletail1pos) > taildotpos.distanceTo(doubletail2pos) + 0.05 && (centertankdot.rotation.y -= 0.01), tower8bit.scene.rotation.y < sharnir1.rotation.y - centertankdot.rotation.y - 1.5707963267948966 && (tower8bit.scene.rotation.y += 0.01), tower8bit.scene.rotation.y > sharnir1.rotation.y - centertankdot.rotation.y - 1.5707963267948966 && (tower8bit.scene.rotation.y -= 0.01), -stvol.scene.rotation.z < sharnir2.rotation.x && (stvol.scene.rotation.z -= 0.01), -stvol.scene.rotation.z > sharnir2.rotation.x && (stvol.scene.rotation.z += 0.01), 8 < 180 * stvol.scene.rotation.z / Math.PI && (stvol.scene.rotation.z = 8 * Math.PI / 180), -15 > 180 * stvol.scene.rotation.z / Math.PI && (stvol.scene.rotation.z = -15 * Math.PI / 180));
+    _0xaf0fx2a = 100 * (8 - Math.sqrt(Math.pow(tank.chassisBody.velocity.x, 2) + Math.pow(tank.chassisBody.velocity.z, 2)));
+    true === goforward && false === goback && false === goleft && false === gogight && 0 > tank.wheelInfos[0].deltaRotation ? (tank.applyEngineForce(_0xaf0fx2a, 0), tank.applyEngineForce(_0xaf0fx2a, 1), tank.applyEngineForce(_0xaf0fx2a, 2), tank.applyEngineForce(_0xaf0fx2a, 3)) : false === goforward && true === goback && false === goleft && false === gogight && 0 < tank.wheelInfos[0].deltaRotation ? (tank.applyEngineForce(-_0xaf0fx2a / 8, 0), tank.applyEngineForce(-_0xaf0fx2a / 8, 1), tank.applyEngineForce(-_0xaf0fx2a / 8, 2), tank.applyEngineForce(-_0xaf0fx2a / 8, 3)) : true === goforward && false === goback && false === goleft && false === gogight && 0 < tank.wheelInfos[0].deltaRotation ? (tank.applyEngineForce(800, 0), tank.applyEngineForce(800, 1), tank.applyEngineForce(800, 2), tank.applyEngineForce(800, 3)) : false === goforward && true === goback && false === goleft && false === gogight && 0 > tank.wheelInfos[0].deltaRotation ? (tank.applyEngineForce(-800, 0), tank.applyEngineForce(-800, 1), tank.applyEngineForce(-800, 2), tank.applyEngineForce(-800, 3)) : true === goleft && false === gogight ? (tank.applyEngineForce(1e4, 0), tank.applyEngineForce(-10000, 1), tank.applyEngineForce(1e4, 2), tank.applyEngineForce(-10000, 3)) : false === goleft && true === gogight ? (tank.applyEngineForce(-10000, 0), tank.applyEngineForce(1e4, 1), tank.applyEngineForce(-10000, 2), tank.applyEngineForce(1e4, 3)) : (tank.applyEngineForce(0, 0), tank.applyEngineForce(0, 1), tank.applyEngineForce(0, 2), tank.applyEngineForce(0, 3));
+    worldf.step(0.016666666666666666);
+    cameradotpos = new THREE.Vector3;
+    cameradot.getWorldPosition(cameradotpos);
+    camera.position.set(cameradotpos.x, cameradotpos.y, cameradotpos.z);
+    camera.lookAt(sharnir1.position.x, sharnir1.position.y, sharnir1.position.z);
+    tank8bit.scene.position.x = tank.chassisBody.position.x;
+    tank8bit.scene.position.y = tank.chassisBody.position.y;
+    tank8bit.scene.position.z = tank.chassisBody.position.z;
+    sharnir1.position.x = tank.chassisBody.position.x;
+    sharnir1.position.y = tank.chassisBody.position.y + 4;
+    sharnir1.position.z = tank.chassisBody.position.z;
+    centertankdot.position.x = tank.chassisBody.position.x;
+    centertankdot.position.y = tank.chassisBody.position.y;
+    centertankdot.position.z = tank.chassisBody.position.z;
+    tank8bit.scene.quaternion.x = tank.chassisBody.quaternion.x;
+    tank8bit.scene.quaternion.y = tank.chassisBody.quaternion.y;
+    tank8bit.scene.quaternion.z = tank.chassisBody.quaternion.z;
+    tank8bit.scene.quaternion.w = tank.chassisBody.quaternion.w;
+    rendrer.render(scena, camera);
+  }
+}, 16.666666666666668);
+
+</script>

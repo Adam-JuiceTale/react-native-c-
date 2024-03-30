@@ -1,0 +1,245 @@
+<canvas id="ctx" width="500px" height="500px" style="position:absolute;top:0px;left:0px"></canvas>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="GLTFLoader.js"></script>
+<script>
+var ctx = document.getElementById('ctx')//.getContext('2d')
+var WIDTH2 = window.innerWidth 
+var HEIGHT2 = window.innerHeight 
+  ctx.width  = WIDTH2
+  ctx.height = HEIGHT2
+
+var rende = new THREE.WebGLRenderer({canvas:ctx})
+rende.setClearColor(0x000000)
+var scene = new THREE.Scene()
+var camera = new THREE.PerspectiveCamera(45, WIDTH2/HEIGHT2,0.1,5000)
+camera.position.set(-310,195,-242)
+
+//var laser = new THREE.AmbientLight(0xffffff)
+//scene.add(laser)
+    const color = 0xffe3b0;
+    const intensity = 0.2;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(5, 10, 2);
+    scene.add(light);
+    scene.add(light.target);
+	const light2 = new THREE.PointLight( 0x6e8dff, 1, 40 );
+light2.position.set( -122,35,-158);
+scene.add( light2 );
+const light3 = new THREE.PointLight( 0x6e8dff, 2, 40 );
+light3.position.set(-143,23.8,-129);
+scene.add( light3 );
+//var geametry = new THREE.SphereGeometry(150,32,32)
+//var material = new THREE.MeshBasicMaterial({color:0x00ff00, wireframe:true})
+//var mesh= new THREE.Mesh(geametry,material)
+//scene.add(mesh)
+
+var start1=0
+var sound=null
+var gomusick=function(){
+if(start1===0){
+const listener = new THREE.AudioListener();
+camera.add( listener );
+sound = new THREE.PositionalAudio( listener );
+//sound.position.set(miku.position.x,miku.position.y,miku.position.z)
+//miku.mainSpeaker_.add(sound)
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'https://proginvert.github.io/3d_resources/battle_sity_map/hatsune_miku/sound3.mp3', function( buffer ) {
+	sound.setBuffer( buffer );
+	miku.add(sound)
+	sound.setLoop( true );
+	sound.setVolume( 1 );
+	sound.setRefDistance(5)
+	sound.setMaxDistance(40)
+	//sound.play();
+	start1=1
+});
+console.log(111)
+//anim2.visible = false;
+}
+}
+function handleStart(e) {
+		if(e.touches) {
+gomusick()
+
+
+
+		}else{
+		
+		}
+		}
+function startup() {
+  var el = ctx//[0]
+  el.addEventListener("touchstart", handleStart, false);
+  //el.addEventListener("touchend", handleEnd, false);
+ // el.addEventListener("touchcancel", handleCancel, false);
+  //el.addEventListener("touchmove", handleMove, false);
+}
+document.addEventListener("DOMContentLoaded", startup);
+document.onmousedown=function(event){
+gomusick()
+}
+var glftload = new THREE.GLTFLoader()
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/snowy_landscape/scene.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+
+
+
+//model.scale.set(3, 3, 3);
+model.position.y-=22//*3
+
+scene.add(model);
+})
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_chassis.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+var scal=0.1
+model.rotation.x+=-90*Math.PI/180
+model.rotation.	z+=-90*Math.PI/180
+model.scale.set(scal, scal, scal);
+model.position.set(-113,21.7,-153)
+
+scene.add(model);
+})
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_tower.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+var scal=0.1
+model.rotation.x+=-90*Math.PI/180
+model.rotation.	z+=-90*Math.PI/180
+model.rotation.	y+=-90*Math.PI/180
+model.scale.set(scal, scal, scal);
+model.position.set(-113,22,-152.8)
+
+scene.add(model);
+})
+glftload.load('https://proginvert.github.io/3d_resources/battle_city_tank/mamont_gun.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+var scal=0.1
+model.rotation.x+=-90*Math.PI/180
+model.rotation.	z+=-90*Math.PI/180
+model.rotation.	y+=-90*Math.PI/180
+model.scale.set(scal, scal, scal);
+model.position.set(-113,22.2,-153.7)
+
+scene.add(model);
+})
+/*
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/pine_tree_-_ps1_low_poly/scene.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+
+
+
+//model.scale.set(3, 3, 3);
+model.position.set(-122,21.34,-158)
+
+scene.add(model);
+})
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/christmas_lights/scene.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+
+
+
+model.scale.set(2, 2, 2);
+model.position.set(-123,25,-158)
+
+scene.add(model);
+})
+*/
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/podium/scene.gltf',(gltfScene)=>{
+var model = gltfScene.scene
+
+
+var scal=1
+model.scale.set(scal, scal, scal);
+model.position.set(-140,23,-126)
+model.rotation.y-=200*Math.PI/180
+scene.add(model);
+})
+var locker2 = new THREE.Clock()
+var biker=null
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/christmas_tree_2/scene.gltf',(gltfScene)=>{
+biker = gltfScene.scene
+biker.mixer = new THREE.AnimationMixer(biker)
+biker.mixer.clipAction(gltfScene.animations[0]).play()
+
+
+//biker.scale.set(3, 3, 3);
+biker.position.set(-122,21.34,-158)
+
+scene.add(biker);
+})
+var locker3 = new THREE.Clock()
+var miku=null
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/hatsune_miku/scene.gltf',(gltfScene)=>{
+miku = gltfScene.scene
+miku.mixer = new THREE.AnimationMixer(miku)
+miku.mixer.clipAction(gltfScene.animations[0]).play()
+
+
+miku.scale.set(200, 200, 200);//miku.scale.set(100, 100, 100);
+miku.position.set(-143,23.8,-129)
+miku.rotation.y-=200*Math.PI/180
+scene.add(miku);
+})
+var locker4 = new THREE.Clock()
+var miku2=null
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/samba_anime_dance/scene.gltf',(gltfScene)=>{
+miku2 = gltfScene.scene
+miku2.mixer = new THREE.AnimationMixer(miku2)
+miku2.mixer.clipAction(gltfScene.animations[0]).play()
+
+var scal=0.008
+miku2.scale.set(scal, scal, scal);
+miku2.position.set(-147,20.3,-143)
+//miku2.rotation.y-=200*Math.PI/180
+scene.add(miku2);
+})
+var locker5 = new THREE.Clock()
+var anim1=null
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/sexy_anime_girl/scene.gltf',(gltfScene)=>{
+anim1 = gltfScene.scene
+anim1.mixer = new THREE.AnimationMixer(anim1)
+anim1.mixer.clipAction(gltfScene.animations[0]).play()
+
+var scal=0.05
+anim1.scale.set(scal, scal, scal);
+anim1.position.set(-145,20.3,-140)
+//anim1.rotation.y-=200*Math.PI/180
+scene.add(anim1);
+})
+var locker6 = new THREE.Clock()
+var anim2=null
+glftload.load('https://proginvert.github.io/3d_resources/battle_sity_map/purpleheartanime/scene.gltf',(gltfScene)=>{
+anim2 = gltfScene.scene
+anim2.mixer = new THREE.AnimationMixer(anim2)
+anim2.mixer.clipAction(gltfScene.animations[3]).play()
+
+var scal=2
+anim2.scale.set(scal, scal, scal);
+anim2.position.set(-140,20.3,-144)
+//anim2.rotation.y-=200*Math.PI/180
+scene.add(anim2);
+})
+var controls = new THREE.OrbitControls(camera, ctx);
+controls.target.x=-113 
+controls.target.y=21.3
+controls.target.z=-153 
+controls.maxDistance=200
+controls.update();
+var timmusick=0
+setInterval(function(){
+timmusick++
+if(timmusick%20===0){
+light3.color.r=Math.random()
+light3.color.g=Math.random()
+light3.color.b=Math.random()
+}
+if(biker!==null&&anim2!==null){
+biker.mixer.update(locker2.getDelta())
+miku.mixer.update(locker3.getDelta())
+miku2.mixer.update(locker4.getDelta())
+anim1.mixer.update(locker5.getDelta())
+anim2.mixer.update(locker6.getDelta())
+}
+rende.render(scene,camera)
+},1000/25)
+</script>

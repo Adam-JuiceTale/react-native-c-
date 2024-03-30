@@ -1,0 +1,213 @@
+<canvas id="ctx" width="500px" height="500px" style="position:absolute;top:0px;left:0px"></canvas>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="GLTFLoader.js"></script>
+<script src="cannon.min.js"></script>
+<script src="CannonDebugRenderer.js"></script>
+<script>
+var ctx = document.getElementById('ctx')//.getContext('2d')
+var WIDTH2 = window.innerWidth 
+var HEIGHT2 = window.innerHeight 
+  ctx.width  = WIDTH2
+  ctx.height = HEIGHT2
+  var maxForce = 1000;
+  var maxSteerVal = 0.5;
+  var goleft=false
+  var goright=false
+  var goup=false
+  var godown=false
+  document.onkeydown=function(event){
+            switch(event.keyCode){
+
+            case 87: // forward
+                //vehicle.applyEngineForce( -maxForce, 2);
+                //vehicle.applyEngineForce( -maxForce, 3);
+				goup=true
+                break;
+
+            case 83: // backward
+                //vehicle.applyEngineForce( maxForce, 2);
+                //vehicle.applyEngineForce( maxForce, 3);
+				godown=true
+                break;
+
+            case 66: // b
+                //vehicle.setBrake(brakeForce, 0);
+                //vehicle.setBrake(brakeForce, 1);
+               // vehicle.setBrake(brakeForce, 2);
+                //vehicle.setBrake(brakeForce, 3);
+                break;
+
+            case 68: // right
+                //vehicle.setSteeringValue( -maxSteerVal, 0);
+                //vehicle.setSteeringValue( -maxSteerVal, 1);
+				goright=true
+                break;
+
+            case 65: // left
+                //vehicle.setSteeringValue( maxSteerVal, 0);
+                //vehicle.setSteeringValue( maxSteerVal, 1);
+				goleft=true
+                break;
+
+            }
+			}
+  document.onkeyup=function(event){
+            switch(event.keyCode){
+
+            case 87: // forward
+                //vehicle.applyEngineForce( -maxForce, 2);
+                //vehicle.applyEngineForce( -maxForce, 3);
+				goup=false
+                break;
+
+            case 83: // backward
+                //vehicle.applyEngineForce( maxForce, 2);
+                //vehicle.applyEngineForce( maxForce, 3);
+				godown=false
+                break;
+
+            case 66: // b
+                //vehicle.setBrake(brakeForce, 0);
+                //vehicle.setBrake(brakeForce, 1);
+               // vehicle.setBrake(brakeForce, 2);
+                //vehicle.setBrake(brakeForce, 3);
+                break;
+
+            case 68: // right
+                //vehicle.setSteeringValue( -maxSteerVal, 0);
+                //vehicle.setSteeringValue( -maxSteerVal, 1);
+				goright=false
+                break;
+
+            case 65: // left
+                //vehicle.setSteeringValue( maxSteerVal, 0);
+                //vehicle.setSteeringValue( maxSteerVal, 1);
+				goleft=false
+                break;
+
+            }
+			}
+var rende = new THREE.WebGLRenderer({canvas:ctx})
+rende.setClearColor(0x000000)
+var scene = new THREE.Scene()
+var camera = new THREE.PerspectiveCamera(45, WIDTH2/HEIGHT2,0.1,5000)
+camera.position.set(0,5,20)
+//camera.getWorldDirection (new THREE.Vector3( 0, 1, 1 ))
+var world = new CANNON.World() 
+world.gravity.set(0, -9.8, 0) 
+var CannonDebugRenderer = new THREE.CannonDebugRenderer(scene, world)
+ let groundBody = new CANNON.Body({
+        mass: 0
+    }) //Создаём тело
+    let groundShape = new CANNON.Plane(0.1, 0.2) //Создаём форму
+    groundBody.addShape(groundShape) //Соеденяем
+    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2) //Поворачиваем в горизонтальное положение
+    world.addBody(groundBody) //Добовляем скелет в мир
+	//Math.sqrt(chassisBody.velocity.x*chassisBody.velocity.x+chassisBody.velocity.z*chassisBody.velocity.z)
+	//
+var chassisShape;
+            chassisShape = new CANNON.Box(new CANNON.Vec3(2, 1,0.5));
+            var chassisBody = new CANNON.Body({ mass: 150 });
+			chassisBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
+            chassisBody.addShape(chassisShape);
+            chassisBody.position.set(0, 4, 4);
+            chassisBody.angularVelocity.set(0, 0, 0.5);
+            //demo.addVisual(chassisBody);
+
+            var options = {
+                radius: 0.5,
+                directionLocal: new CANNON.Vec3(0, 0, -1),
+                suspensionStiffness: 30,
+                suspensionRestLength: 0.3,
+                frictionSlip: 5,
+                dampingRelaxation: 2.3,
+                dampingCompression: 4.4,
+                maxSuspensionForce: 100000,
+                rollInfluence:  0.01,
+                axleLocal: new CANNON.Vec3(0, 1, 0),
+                chassisConnectionPointLocal: new CANNON.Vec3(1, 1, 0),
+                maxSuspensionTravel: 0.3,
+                customSlidingRotationalSpeed: -30,
+                useCustomSlidingRotationalSpeed: true
+            };
+
+            // Create the vehicle
+            vehicle = new CANNON.RaycastVehicle({
+                chassisBody: chassisBody,
+            });
+
+            options.chassisConnectionPointLocal.set(1, 1, 0);
+            vehicle.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(1, -1, 0);
+            vehicle.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(-1, 1, 0);
+            vehicle.addWheel(options);
+
+            options.chassisConnectionPointLocal.set(-1, -1, 0);
+            vehicle.addWheel(options);
+
+            vehicle.addToWorld(world);
+
+            var wheelBodies = [];
+            for(var i=0; i<vehicle.wheelInfos.length; i++){
+                var wheel = vehicle.wheelInfos[i];
+                var cylinderShape = new CANNON.Cylinder(wheel.radius, wheel.radius, wheel.radius / 2, 20);
+                var wheelBody = new CANNON.Body({
+                    mass: 0
+                });
+                wheelBody.type = CANNON.Body.KINEMATIC;
+                wheelBody.collisionFilterGroup = 0; // turn off collisions
+                var q = new CANNON.Quaternion();
+                q.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);
+                wheelBody.addShape(cylinderShape, new CANNON.Vec3(), q);
+                wheelBodies.push(wheelBody);
+                //demo.addVisual(wheelBody);
+                world.addBody(wheelBody);
+            }
+
+            // Update wheels
+            world.addEventListener('postStep', function(){
+                for (var i = 0; i < vehicle.wheelInfos.length; i++) {
+                    vehicle.updateWheelTransform(i);
+                    var t = vehicle.wheelInfos[i].worldTransform;
+                    var wheelBody = wheelBodies[i];
+                    wheelBody.position.copy(t.position);
+                    wheelBody.quaternion.copy(t.quaternion);
+                }
+            });
+setInterval(function(){
+console.log(Math.sqrt(chassisBody.velocity.x*chassisBody.velocity.x+chassisBody.velocity.z*chassisBody.velocity.z))
+if(goleft===true){
+vehicle.setSteeringValue( maxSteerVal, 0);
+vehicle.setSteeringValue( maxSteerVal, 1);
+}else if(goright===true){
+vehicle.setSteeringValue( -maxSteerVal, 0);
+vehicle.setSteeringValue( -maxSteerVal, 1);
+}else{
+vehicle.setSteeringValue( 0, 0);
+vehicle.setSteeringValue( 0, 1);
+}
+
+if(goup===true){
+vehicle.applyEngineForce( -maxForce, 2);
+vehicle.applyEngineForce( -maxForce, 3);
+}else if(godown===true){
+vehicle.applyEngineForce( maxForce, 2);
+vehicle.applyEngineForce( maxForce, 3);
+}else{
+vehicle.applyEngineForce( 0, 2);
+vehicle.applyEngineForce( 0, 3);
+}
+camera.position.set(chassisBody.position.x,chassisBody.position.y,chassisBody.position.z)
+camera.quaternion.z = chassisBody.quaternion.z,
+        camera.quaternion.y = chassisBody.quaternion.y,
+        camera.quaternion.x = chassisBody.quaternion.x,
+        camera.quaternion.w = chassisBody.quaternion.w,
+world.step(1 / 60)
+CannonDebugRenderer.update()
+rende.render(scene,camera)
+},1000/25)
+</script>

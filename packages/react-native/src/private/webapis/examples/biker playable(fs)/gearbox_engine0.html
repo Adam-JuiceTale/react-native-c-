@@ -1,0 +1,23 @@
+<canvas id="ctx" width="500px" height="500px" style="position:absolute;top:0px;left:0px"></canvas>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="GLTFLoader.js"></script>
+<script>
+var ctx = document.getElementById('ctx')//.getContext('2d')
+var WIDTH2 = window.innerWidth 
+var HEIGHT2 = window.innerHeight 
+  ctx.width  = WIDTH2
+  ctx.height = HEIGHT2
+
+var rende = new THREE.WebGLRenderer({canvas:ctx})
+rende.setClearColor(0x000000)
+var scene = new THREE.Scene()
+var camera = new THREE.PerspectiveCamera(45, WIDTH2/HEIGHT2,0.1,5000)
+camera.position.set(0,0,1000)
+
+
+setInterval(function(){
+
+rende.render(scene,camera)
+},1000/25)
+</script>
